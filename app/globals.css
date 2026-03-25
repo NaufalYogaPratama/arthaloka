@@ -3,25 +3,27 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ArthaLoka Design System */
+  --color-easy: #16a34a;
+  --color-medium: #2563eb;
+  --color-hard: #dc2626;
+  --color-bg: #f0fdf4;
+  --color-accent: #fbbf24;
+  --color-mascot: #f97316;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-nunito), "Nunito", sans-serif;
+  background-color: var(--color-bg);
+  min-height: 100vh;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.font-fredoka {
+  font-family: var(--font-fredoka), "Fredoka", cursive;
 }

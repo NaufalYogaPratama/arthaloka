@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  name         String?
+  email        String?       @unique
+  authProvider String        @default("GUEST") // GOOGLE | GUEST
+  createdAt    DateTime      @default(now())
+  sessions     GameSession[]
+  leaderboard  Leaderboard[]
+}
+
+model Question {
+  id              String @id @default(uuid())
+  level           Level
+  questionText    String
+  options         Json   // String[] — 4 options
+  correctIndex    Int    // NEVER sent to client
+  educationalFact String // shown in Ruang Belajar
+}
+
+model GameSession {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  level          Level
+  score          Int
+  maxCombo       Int
+  livesRemaining Int
+  completedAt    DateTime @default(now())
+}
+
+model Leaderboard {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  highestScore Int
+  level        Level
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, level])
+}
+
+enum Level {
+  EASY
+  MEDIUM
+  HARD
+}

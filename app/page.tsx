@@ -1,101 +1,115 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
+export default function LoginPage() {
+  const router = useRouter();
+
+  const handleGoogleLogin = () => {
+    signIn("google", { callbackUrl: "/level-select" });
+  };
+
+  const handleGuestLogin = async () => {
+    const result = await signIn("guest", {
+      redirect: false,
+    });
+    if (result?.ok) {
+      router.push("/level-select");
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <main className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-green-100 via-emerald-50 to-teal-100">
+      {/* Decorative background circles */}
+      <div className="absolute top-[-80px] left-[-60px] w-[250px] h-[250px] rounded-full bg-green-200/40 blur-2xl" />
+      <div className="absolute top-[20%] right-[-40px] w-[200px] h-[200px] rounded-full bg-teal-200/40 blur-2xl" />
+      <div className="absolute bottom-[-60px] left-[30%] w-[300px] h-[300px] rounded-full bg-emerald-200/30 blur-3xl" />
+      <div className="absolute bottom-[20%] right-[10%] w-[150px] h-[150px] rounded-full bg-lime-200/40 blur-2xl" />
+      <div className="absolute top-[60%] left-[10%] w-[120px] h-[120px] rounded-full bg-green-300/25 blur-xl" />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      {/* Decorative small circles */}
+      <div className="absolute top-[15%] left-[20%] w-4 h-4 rounded-full bg-green-300/60 animate-pulse" />
+      <div className="absolute top-[30%] right-[25%] w-3 h-3 rounded-full bg-teal-300/60 animate-pulse delay-500" />
+      <div className="absolute bottom-[25%] left-[15%] w-5 h-5 rounded-full bg-emerald-300/50 animate-pulse delay-1000" />
+      <div className="absolute top-[50%] right-[15%] w-3 h-3 rounded-full bg-lime-400/50 animate-pulse delay-700" />
+
+      {/* Floating leaf emojis */}
+      <div className="absolute top-[10%] right-[30%] text-3xl animate-bounce opacity-30">
+        🌿
+      </div>
+      <div className="absolute bottom-[15%] right-[20%] text-2xl animate-bounce delay-300 opacity-30">
+        🍃
+      </div>
+      <div className="absolute top-[40%] left-[8%] text-2xl animate-bounce delay-700 opacity-25">
+        🌱
+      </div>
+
+      {/* Main card */}
+      <div className="relative z-10 w-full max-w-md mx-4 px-8 py-12 rounded-3xl bg-white/70 backdrop-blur-xl shadow-xl border border-white/50 text-center">
+        {/* Engklek icon */}
+        <div className="text-6xl mb-4 drop-shadow-lg">🎯</div>
+
+        {/* Logo */}
+        <h1 className="font-fredoka text-5xl md:text-6xl font-bold text-green-700 tracking-tight mb-2 drop-shadow-sm">
+          ArthaLoka
+        </h1>
+
+        {/* Tagline */}
+        <p className="text-lg md:text-xl text-green-600 font-semibold mb-10">
+          Belajar Keuangan, Main Engklek! 🎮
+        </p>
+
+        {/* Login buttons */}
+        <div className="flex flex-col gap-4">
+          {/* Google Login */}
+          <button
+            onClick={handleGoogleLogin}
+            className="flex items-center justify-center gap-3 w-full py-4 px-6 rounded-2xl bg-white border-2 border-gray-200 text-gray-700 font-bold text-base hover:border-green-400 hover:shadow-lg transition-all duration-200 active:scale-[0.98]"
           >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            {/* Google Icon */}
+            <svg width="22" height="22" viewBox="0 0 48 48">
+              <path
+                fill="#FFC107"
+                d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"
+              />
+              <path
+                fill="#FF3D00"
+                d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"
+              />
+              <path
+                fill="#4CAF50"
+                d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"
+              />
+              <path
+                fill="#1976D2"
+                d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"
+              />
+            </svg>
+            Login dengan Google
+          </button>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-gray-300/60" />
+            <span className="text-sm text-gray-400 font-medium">atau</span>
+            <div className="flex-1 h-px bg-gray-300/60" />
+          </div>
+
+          {/* Guest Login */}
+          <button
+            onClick={handleGuestLogin}
+            className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold text-base shadow-lg shadow-green-500/25 hover:shadow-xl hover:shadow-green-500/30 hover:from-green-600 hover:to-emerald-600 transition-all duration-200 active:scale-[0.98]"
           >
-            Read our docs
-          </a>
+            🎮 Bermain sebagai Guest
+          </button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        {/* Footer text */}
+        <p className="mt-8 text-xs text-gray-400">
+          Gamifikasi Literasi Keuangan Indonesia 🇮🇩
+        </p>
+      </div>
+    </main>
   );
 }
