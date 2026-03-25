@@ -3,10 +3,16 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { useGameStore, getForwardPath, getBackwardPath } from "@/store/gameStore";
+import {
+    useGameStore,
+    getForwardPath,
+    getBackwardPath,
+} from "@/store/gameStore";
 import EngklekBoard from "@/components/game/EngklekBoard";
 import CountdownOverlay from "@/components/game/CountdownOverlay";
 import HUDBar from "@/components/game/HUDBar";
+import QuizModal from "@/components/game/QuizModal";
+import MascotPopup from "@/components/game/MascotPopup";
 
 export default function GamePage() {
     const router = useRouter();
@@ -14,16 +20,32 @@ export default function GamePage() {
     const level = useGameStore((s) => s.level);
     const stonePosition = useGameStore((s) => s.stonePosition);
     const roundNum = useGameStore((s) => s.roundNum);
+    const questionIdx = useGameStore((s) => s.questionIdx);
+    const questions = useGameStore((s) => s.questions);
+    const showMascot = useGameStore((s) => s.showMascot);
+    const mascotLives = useGameStore((s) => s.mascotLives);
+    const lastScoreGain = useGameStore((s) => s.lastScoreGain);
     const setPhase = useGameStore((s) => s.setPhase);
     const throwStone = useGameStore((s) => s.throwStone);
     const nextPhase = useGameStore((s) => s.nextPhase);
     const resetGame = useGameStore((s) => s.resetGame);
     const incrementQuestionIdx = useGameStore((s) => s.incrementQuestionIdx);
+    const answerQuestion = useGameStore((s) => s.answerQuestion);
+    const fetchQuestions = useGameStore((s) => s.fetchQuestions);
+    const dismissMascot = useGameStore((s) => s.dismissMascot);
 
     const [showCountdown, setShowCountdown] = useState(true);
     const [animatingPath, setAnimatingPath] = useState<string[]>([]);
     const [statusText, setStatusText] = useState("");
+    const [showQuiz, setShowQuiz] = useState(false);
+    const [currentQuizType, setCurrentQuizType] = useState<"quiz1" | "quiz2">(
+        "quiz1"
+    );
     const phaseHandledRef = useRef<string>("");
+    const quizPendingPhaseRef = useRef<GamePhase | null>(null);
+
+    // Type import for quiz phase tracking
+    type GamePhase = Parameters<typeof setPhase>[0];
 
     // Redirect if no level selected
     useEffect(() => {
@@ -32,10 +54,20 @@ export default function GamePage() {
         }
     }, [level, router]);
 
-    // Reset game on mount
+    // Reset game & fetch questions on mount
     useEffect(() => {
         resetGame();
+        if (level) {
+            fetchQuestions(level);
+        }
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Redirect to game-over on game_over phase
+    useEffect(() => {
+        if (phase === "game_over") {
+            router.push("/game-over");
+        }
+    }, [phase, router]);
 
     // Countdown complete → go to idle
     const handleCountdownComplete = useCallback(() => {
@@ -43,9 +75,46 @@ export default function GamePage() {
         setPhase("idle");
     }, [setPhase]);
 
+    // ── Path position helpers ──
+    const getStoneSeqIdx = useCallback(
+        (sp: number) => {
+            const fullSequence = ["1", "2-3", "4", "5-6", "7"];
+            const stoneSeqStr =
+                sp === 2 || sp === 3
+                    ? "2-3"
+                    : sp === 5 || sp === 6
+                        ? "5-6"
+                        : sp.toString();
+            return fullSequence.indexOf(stoneSeqStr);
+        },
+        []
+    );
+
+    const filterBySequence = useCallback(
+        (
+            path: string[],
+            sequence: string[],
+            stoneSeqIdx: number,
+            before: boolean
+        ) => {
+            return path.filter((p) => {
+                const singleIdx = sequence.indexOf(
+                    p === "2" || p === "3"
+                        ? "2-3"
+                        : p === "5" || p === "6"
+                            ? "5-6"
+                            : p
+                );
+                return before
+                    ? singleIdx < stoneSeqIdx
+                    : singleIdx > stoneSeqIdx;
+            });
+        },
+        []
+    );
+
     // ── Phase state machine auto-play loop ──
     useEffect(() => {
-        // Prevent double-handling the same phase
         const phaseKey = `${phase}-${roundNum}-${stonePosition}`;
         if (phaseHandledRef.current === phaseKey) return;
         phaseHandledRef.current = phaseKey;
@@ -62,43 +131,33 @@ export default function GamePage() {
 
             case "throwing":
                 setStatusText("Melempar batu! 🪨");
-                // Stone animation will call onStoneAnimationComplete
                 break;
 
             case "jumping_fwd":
                 setStatusText("Melompat maju! 🦘");
                 if (stonePosition) {
                     const fwdPath = getForwardPath(stonePosition);
+                    const fwdSeq = ["1", "2-3", "4", "5-6", "7"];
+                    const stoneIdx = getStoneSeqIdx(stonePosition);
 
-                    // Find the logical position of stone in the sequence
-                    const fullSequence = ["1", "2-3", "4", "5-6", "7"];
-                    const stoneSeqStr =
-                        stonePosition === 2 || stonePosition === 3
-                            ? "2-3"
-                            : stonePosition === 5 || stonePosition === 6
-                                ? "5-6"
-                                : stonePosition.toString();
-                    const stoneSeqIdx = fullSequence.indexOf(stoneSeqStr);
+                    const pathBeforeStone = filterBySequence(
+                        fwdPath,
+                        fwdSeq,
+                        stoneIdx,
+                        true
+                    );
 
-                    // Jump to positions before the stone (quiz1 triggers before stone)
-                    const pathBeforeStone = fwdPath.filter((p) => {
-                        const singleIdx = fullSequence.indexOf(
-                            p === "2" || p === "3"
-                                ? "2-3"
-                                : p === "5" || p === "6"
-                                    ? "5-6"
-                                    : p
-                        );
-                        return singleIdx < stoneSeqIdx;
-                    });
+                    setAnimatingPath(
+                        pathBeforeStone.length > 0 ? pathBeforeStone : []
+                    );
 
-                    setAnimatingPath(pathBeforeStone.length > 0 ? pathBeforeStone : []);
-
-                    // If no steps before stone (stone is on petak 1), go directly to quiz
                     if (pathBeforeStone.length === 0) {
                         timer = setTimeout(() => {
+                            // Show quiz
+                            setCurrentQuizType("quiz1");
+                            setShowQuiz(true);
+                            quizPendingPhaseRef.current = "jumping_continue";
                             setPhase("quiz1");
-                            incrementQuestionIdx();
                         }, 500);
                     }
                 }
@@ -106,40 +165,26 @@ export default function GamePage() {
 
             case "quiz1":
                 setStatusText("📝 Quiz Maju! Jawab pertanyaan...");
-                // Phase 3 will add QuizModal. For now, auto-advance after delay.
-                timer = setTimeout(() => {
-                    setPhase("jumping_continue");
-                }, 1500);
+                // Quiz modal handles this phase
                 break;
 
             case "jumping_continue":
                 setStatusText("Melanjutkan lompatan! 🦘");
                 if (stonePosition) {
                     const fwdPath = getForwardPath(stonePosition);
+                    const fwdSeq = ["1", "2-3", "4", "5-6", "7"];
+                    const stoneIdx = getStoneSeqIdx(stonePosition);
 
-                    const fullSequence = ["1", "2-3", "4", "5-6", "7"];
-                    const stoneStr = stonePosition.toString();
-                    const stoneSeqStr =
-                        stonePosition === 2 || stonePosition === 3
-                            ? "2-3"
-                            : stonePosition === 5 || stonePosition === 6
-                                ? "5-6"
-                                : stoneStr;
-                    const stoneSeqIdx = fullSequence.indexOf(stoneSeqStr);
+                    const pathAfterStone = filterBySequence(
+                        fwdPath,
+                        fwdSeq,
+                        stoneIdx,
+                        false
+                    );
 
-                    // Jump positions AFTER the stone (including stone skip)
-                    const pathAfterStone = fwdPath.filter((p) => {
-                        const singleIdx = fullSequence.indexOf(
-                            p === "2" || p === "3"
-                                ? "2-3"
-                                : p === "5" || p === "6"
-                                    ? "5-6"
-                                    : p
-                        );
-                        return singleIdx > stoneSeqIdx;
-                    });
-
-                    setAnimatingPath(pathAfterStone.length > 0 ? pathAfterStone : ["7"]);
+                    setAnimatingPath(
+                        pathAfterStone.length > 0 ? pathAfterStone : ["7"]
+                    );
                 }
                 break;
 
@@ -154,8 +199,14 @@ export default function GamePage() {
                 setStatusText("Melompat mundur! 🦘");
                 if (stonePosition) {
                     const backPath = getBackwardPath(stonePosition);
-
-                    const fullSequence = ["7", "5-6", "4", "2-3", "1", "start"];
+                    const backSeq = [
+                        "7",
+                        "5-6",
+                        "4",
+                        "2-3",
+                        "1",
+                        "start",
+                    ];
                     const stoneStr = stonePosition.toString();
                     const stoneSeqStr =
                         stonePosition === 2 || stonePosition === 3
@@ -163,11 +214,10 @@ export default function GamePage() {
                             : stonePosition === 5 || stonePosition === 6
                                 ? "5-6"
                                 : stoneStr;
-                    const stoneSeqIdx = fullSequence.indexOf(stoneSeqStr);
+                    const stoneSeqIdx = backSeq.indexOf(stoneSeqStr);
 
-                    // Jump backward until BEFORE the stone (for quiz2)
                     const pathBeforeStone = backPath.filter((p) => {
-                        const singleIdx = fullSequence.indexOf(
+                        const singleIdx = backSeq.indexOf(
                             p === "2" || p === "3"
                                 ? "2-3"
                                 : p === "5" || p === "6"
@@ -177,12 +227,16 @@ export default function GamePage() {
                         return singleIdx < stoneSeqIdx;
                     });
 
-                    setAnimatingPath(pathBeforeStone.length > 0 ? pathBeforeStone : []);
+                    setAnimatingPath(
+                        pathBeforeStone.length > 0 ? pathBeforeStone : []
+                    );
 
                     if (pathBeforeStone.length === 0) {
                         timer = setTimeout(() => {
+                            setCurrentQuizType("quiz2");
+                            setShowQuiz(true);
+                            quizPendingPhaseRef.current = "pickup";
                             setPhase("quiz2");
-                            incrementQuestionIdx();
                         }, 500);
                     }
                 }
@@ -190,18 +244,20 @@ export default function GamePage() {
 
             case "quiz2":
                 setStatusText("📝 Quiz Ambil Batu! Jawab pertanyaan...");
-                // Phase 3 will add QuizModal. For now, auto-advance.
-                timer = setTimeout(() => {
-                    setPhase("pickup");
-                }, 1500);
                 break;
 
             case "pickup":
                 setStatusText("Mengambil batu! 🪨");
                 if (stonePosition) {
                     const backPath = getBackwardPath(stonePosition);
-
-                    const fullSequence = ["7", "5-6", "4", "2-3", "1", "start"];
+                    const backSeq = [
+                        "7",
+                        "5-6",
+                        "4",
+                        "2-3",
+                        "1",
+                        "start",
+                    ];
                     const stoneStr = stonePosition.toString();
                     const stoneSeqStr =
                         stonePosition === 2 || stonePosition === 3
@@ -209,11 +265,10 @@ export default function GamePage() {
                             : stonePosition === 5 || stonePosition === 6
                                 ? "5-6"
                                 : stoneStr;
-                    const stoneSeqIdx = fullSequence.indexOf(stoneSeqStr);
+                    const stoneSeqIdx = backSeq.indexOf(stoneSeqStr);
 
-                    // Continue from stone position back to start
                     const pathFromStone = backPath.filter((p) => {
-                        const singleIdx = fullSequence.indexOf(
+                        const singleIdx = backSeq.indexOf(
                             p === "2" || p === "3"
                                 ? "2-3"
                                 : p === "5" || p === "6"
@@ -223,7 +278,6 @@ export default function GamePage() {
                         return singleIdx >= stoneSeqIdx;
                     });
 
-                    // Include 'start' as final destination
                     if (!pathFromStone.includes("start")) {
                         pathFromStone.push("start");
                     }
@@ -245,7 +299,6 @@ export default function GamePage() {
 
             case "finished":
                 setStatusText("🏆 Selesai! Lihat hasil...");
-                // In Phase 4, this will redirect to result page
                 break;
         }
 
@@ -260,15 +313,20 @@ export default function GamePage() {
     }, [setPhase]);
 
     const handleCharacterAnimationComplete = useCallback(() => {
-        // Determine next phase based on current phase
         const currentPhase = useGameStore.getState().phase;
 
         if (currentPhase === "jumping_fwd") {
+            setCurrentQuizType("quiz1");
+            setShowQuiz(true);
+            quizPendingPhaseRef.current = "jumping_continue";
             setPhase("quiz1");
             incrementQuestionIdx();
         } else if (currentPhase === "jumping_continue") {
             setPhase("at_head");
         } else if (currentPhase === "jumping_back") {
+            setCurrentQuizType("quiz2");
+            setShowQuiz(true);
+            quizPendingPhaseRef.current = "pickup";
             setPhase("quiz2");
             incrementQuestionIdx();
         } else if (currentPhase === "pickup") {
@@ -278,6 +336,58 @@ export default function GamePage() {
         setAnimatingPath([]);
     }, [setPhase, incrementQuestionIdx]);
 
+    // ── Quiz answer handler ──
+    const handleQuizAnswer = useCallback(
+        async (selectedIndex: number) => {
+            return await answerQuestion(selectedIndex);
+        },
+        [answerQuestion]
+    );
+
+    // ── Quiz complete (auto-close modal and advance) ──
+    const handleQuizComplete = useCallback(() => {
+        setShowQuiz(false);
+        const state = useGameStore.getState();
+
+        // Don't advance if game over
+        if (state.lives <= 0 || state.phase === "game_over") return;
+
+        // If mascot is showing (wrong answer), wait for mascot dismiss
+        if (state.showMascot) return;
+
+        // Advance to next phase
+        const pendingPhase = quizPendingPhaseRef.current;
+        if (pendingPhase) {
+            setPhase(pendingPhase);
+            quizPendingPhaseRef.current = null;
+        }
+    }, [setPhase]);
+
+    // ── Mascot dismiss → continue game ──
+    const handleMascotContinue = useCallback(() => {
+        dismissMascot();
+        const state = useGameStore.getState();
+
+        if (state.lives <= 0) return;
+
+        // Advance to the pending phase
+        const pendingPhase = quizPendingPhaseRef.current;
+        if (pendingPhase) {
+            setPhase(pendingPhase);
+            quizPendingPhaseRef.current = null;
+        }
+    }, [dismissMascot, setPhase]);
+
+    const handleRestart = useCallback(() => {
+        resetGame();
+        if (level) {
+            fetchQuestions(level);
+        }
+        setShowCountdown(true);
+        setShowQuiz(false);
+        phaseHandledRef.current = "";
+    }, [resetGame, fetchQuestions, level]);
+
     if (!level) return null;
 
     const levelColors = {
@@ -285,6 +395,8 @@ export default function GamePage() {
         medium: "from-blue-50 via-sky-50 to-cyan-50",
         hard: "from-red-50 via-rose-50 to-pink-50",
     };
+
+    const currentQuestion = questions[questionIdx] || null;
 
     return (
         <main
@@ -337,11 +449,33 @@ export default function GamePage() {
                         </motion.div>
                     </AnimatePresence>
 
+                    {/* Floating score gain */}
+                    <AnimatePresence>
+                        {lastScoreGain && (
+                            <motion.div
+                                key={`score-${Date.now()}`}
+                                initial={{ opacity: 1, y: 0, scale: 0.5 }}
+                                animate={{ opacity: 0, y: -60, scale: 1.2 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 1.5, ease: "easeOut" }}
+                                className="absolute top-1/3 left-1/2 -translate-x-1/2 z-30"
+                            >
+                                <span className="font-fredoka text-3xl font-bold text-amber-500 drop-shadow-lg">
+                                    +{lastScoreGain}
+                                </span>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
                     {/* Board */}
                     <div className="relative w-full max-w-[360px]">
                         <EngklekBoard
-                            onStoneAnimationComplete={handleStoneAnimationComplete}
-                            onCharacterAnimationComplete={handleCharacterAnimationComplete}
+                            onStoneAnimationComplete={
+                                handleStoneAnimationComplete
+                            }
+                            onCharacterAnimationComplete={
+                                handleCharacterAnimationComplete
+                            }
                             animatingPath={animatingPath}
                         />
                     </div>
@@ -360,11 +494,14 @@ export default function GamePage() {
                                         Permainan Selesai!
                                     </h2>
                                     <p className="text-gray-500 text-sm mb-6">
-                                        Kamu telah menyelesaikan 5 jalan engklek!
+                                        Kamu telah menyelesaikan 5 jalan
+                                        engklek!
                                     </p>
                                     <div className="flex flex-col gap-3">
                                         <button
-                                            onClick={() => router.push("/level-select")}
+                                            onClick={() =>
+                                                router.push("/level-select")
+                                            }
                                             className="w-full py-3 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold shadow-lg shadow-green-500/25 hover:shadow-xl transition-all active:scale-[0.98]"
                                         >
                                             🔄 Main Lagi
@@ -382,6 +519,29 @@ export default function GamePage() {
                     </AnimatePresence>
                 </motion.div>
             )}
+
+            {/* Quiz Modal */}
+            <AnimatePresence>
+                {showQuiz && currentQuestion && (
+                    <QuizModal
+                        question={currentQuestion}
+                        quizType={currentQuizType}
+                        onAnswer={handleQuizAnswer}
+                        onComplete={handleQuizComplete}
+                    />
+                )}
+            </AnimatePresence>
+
+            {/* Mascot Popup */}
+            <AnimatePresence>
+                {showMascot && (
+                    <MascotPopup
+                        livesRemaining={mascotLives}
+                        onContinue={handleMascotContinue}
+                        onRestart={handleRestart}
+                    />
+                )}
+            </AnimatePresence>
         </main>
     );
 }

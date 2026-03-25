@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { calculateScore, getMultiplier } from "@/lib/scoring";
 
 export interface QuizQuestion {
     id: string;
@@ -46,15 +47,27 @@ export interface GameState {
     questions: QuizQuestion[];
     collectedFacts: string[];
 
+    // Mascot popup state
+    showMascot: boolean;
+    mascotLives: number;
+
+    // Score animation
+    lastScoreGain: number | null;
+
     // Actions
     setLevel: (level: "easy" | "medium" | "hard") => void;
     setPlayerInfo: (name: string, isGuest: boolean) => void;
     setPhase: (phase: GamePhase) => void;
     setCharacterPosition: (position: string) => void;
+    setQuestions: (questions: QuizQuestion[]) => void;
     throwStone: () => void;
-    answerQuestion: (answerIndex: number) => Promise<boolean>;
+    answerQuestion: (
+        answerIndex: number
+    ) => Promise<{ correct: boolean; correctIndex: number }>;
+    fetchQuestions: (level: string) => Promise<void>;
     nextPhase: () => void;
     incrementQuestionIdx: () => void;
+    dismissMascot: () => void;
     resetGame: () => void;
 }
 
@@ -63,8 +76,7 @@ export interface GameState {
  * Petak 1 has half the weight of others to avoid landing there too often.
  */
 function weightedRandomPetak(): number {
-    // Weights: petak 1 = 1, petaks 2-7 = 2 each → total = 13
-    const weights = [1, 2, 2, 2, 2, 2, 2]; // index 0 = petak 1
+    const weights = [1, 2, 2, 2, 2, 2, 2];
     const totalWeight = weights.reduce((a, b) => a + b, 0);
     let rand = Math.random() * totalWeight;
 
@@ -72,35 +84,27 @@ function weightedRandomPetak(): number {
         rand -= weights[i];
         if (rand <= 0) return i + 1;
     }
-    return 7; // fallback
+    return 7;
 }
 
 /**
  * Compute the forward path from START to head (petak 7).
- * For side-by-side petaks (2/3, 5/6), character goes to the LEFT petak by default
- * UNLESS the stone is on the left petak — then go to the RIGHT petak.
- * Skip any petak that has the stone.
  */
 export function getForwardPath(stonePos: number | null): string[] {
     const path: string[] = [];
 
-    // Petak 1 (center)
     if (stonePos !== 1) path.push("1");
 
-    // Petaks 2/3 (side-by-side) — pick one, skip stone
     if (stonePos === 2) {
         path.push("3");
     } else if (stonePos === 3) {
         path.push("2");
     } else {
-        // No stone on 2 or 3, go to both (hop on one foot each)
         path.push("2-3");
     }
 
-    // Petak 4 (center)
     if (stonePos !== 4) path.push("4");
 
-    // Petaks 5/6 (side-by-side) — same logic as 2/3
     if (stonePos === 5) {
         path.push("6");
     } else if (stonePos === 6) {
@@ -109,7 +113,6 @@ export function getForwardPath(stonePos: number | null): string[] {
         path.push("5-6");
     }
 
-    // Petak 7 (kepala / head)
     if (stonePos !== 7) path.push("7");
 
     return path;
@@ -117,15 +120,12 @@ export function getForwardPath(stonePos: number | null): string[] {
 
 /**
  * Compute the backward path from head (petak 7) back to START.
- * Mirror of forward path logic.
  */
 export function getBackwardPath(stonePos: number | null): string[] {
     const path: string[] = [];
 
-    // Petak 7
     if (stonePos !== 7) path.push("7");
 
-    // Petaks 5/6
     if (stonePos === 5) {
         path.push("6");
     } else if (stonePos === 6) {
@@ -134,10 +134,8 @@ export function getBackwardPath(stonePos: number | null): string[] {
         path.push("5-6");
     }
 
-    // Petak 4
     if (stonePos !== 4) path.push("4");
 
-    // Petaks 2/3
     if (stonePos === 2) {
         path.push("3");
     } else if (stonePos === 3) {
@@ -146,10 +144,8 @@ export function getBackwardPath(stonePos: number | null): string[] {
         path.push("2-3");
     }
 
-    // Petak 1
     if (stonePos !== 1) path.push("1");
 
-    // Back to start
     path.push("start");
 
     return path;
@@ -180,6 +176,13 @@ export const useGameStore = create<GameState>((set, get) => ({
     questions: [],
     collectedFacts: [],
 
+    // Mascot state
+    showMascot: false,
+    mascotLives: 3,
+
+    // Score animation
+    lastScoreGain: null,
+
     // Actions
     setLevel: (level) => set({ level }),
 
@@ -189,20 +192,96 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     setCharacterPosition: (position) => set({ characterPosition: position }),
 
+    setQuestions: (questions) => set({ questions }),
+
     throwStone: () => {
         const position = weightedRandomPetak();
         set({ stonePosition: position, phase: "throwing" });
     },
 
-    answerQuestion: async (answerIndex: number): Promise<boolean> => {
-        // Stub — will be implemented in Phase 3 with server-side validation
+    fetchQuestions: async (level: string) => {
+        try {
+            const res = await fetch(`/api/quiz?level=${level}`);
+            if (!res.ok) throw new Error("Failed to fetch questions");
+            const questions = await res.json();
+            set({ questions });
+        } catch (error) {
+            console.error("Failed to fetch questions:", error);
+        }
+    },
+
+    answerQuestion: async (answerIndex: number) => {
         const state = get();
-        console.log(`Answer ${answerIndex} for question ${state.questionIdx}`);
-        return true;
+        const currentQuestion = state.questions[state.questionIdx];
+
+        if (!currentQuestion) {
+            // Fallback if no question loaded
+            return { correct: true, correctIndex: answerIndex };
+        }
+
+        try {
+            const res = await fetch("/api/quiz/validate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    questionId: currentQuestion.id,
+                    selectedIndex: answerIndex,
+                }),
+            });
+
+            if (!res.ok) throw new Error("Validation failed");
+
+            const data = await res.json();
+            const { correct, educationalFact, correctIndex } = data;
+
+            if (correct) {
+                // ✅ Correct answer
+                const newCombo = state.combo + 1;
+                const points = calculateScore(newCombo);
+                const newMaxCombo = Math.max(state.maxCombo, newCombo);
+
+                set({
+                    combo: newCombo,
+                    maxCombo: newMaxCombo,
+                    score: state.score + points,
+                    lastScoreGain: points,
+                    collectedFacts: [...state.collectedFacts, educationalFact],
+                });
+
+                // Clear score gain display after animation
+                setTimeout(() => set({ lastScoreGain: null }), 1500);
+            } else {
+                // ❌ Wrong answer
+                const newLives = state.lives - 1;
+
+                set({
+                    lives: newLives,
+                    combo: 0,
+                    lastScoreGain: null,
+                    collectedFacts: [...state.collectedFacts, educationalFact],
+                    showMascot: true,
+                    mascotLives: newLives,
+                });
+
+                if (newLives <= 0) {
+                    set({ phase: "game_over" });
+                }
+            }
+
+            return { correct, correctIndex };
+        } catch (error) {
+            console.error("Answer validation error:", error);
+            // Fallback: treat as correct to not block game
+            return { correct: true, correctIndex: answerIndex };
+        }
     },
 
     incrementQuestionIdx: () => {
         set((state) => ({ questionIdx: state.questionIdx + 1 }));
+    },
+
+    dismissMascot: () => {
+        set({ showMascot: false });
     },
 
     nextPhase: () => {
@@ -251,5 +330,8 @@ export const useGameStore = create<GameState>((set, get) => ({
             lives: 3,
             questions: [],
             collectedFacts: [],
+            showMascot: false,
+            mascotLives: 3,
+            lastScoreGain: null,
         }),
 }));
