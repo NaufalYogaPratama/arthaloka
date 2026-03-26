@@ -2,17 +2,29 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
+import dynamic from "next/dynamic";
 import {
     useGameStore,
     getForwardPath,
     getBackwardPath,
 } from "@/store/gameStore";
-import EngklekBoard from "@/components/game/EngklekBoard";
-import CountdownOverlay from "@/components/game/CountdownOverlay";
-import HUDBar from "@/components/game/HUDBar";
-import QuizModal from "@/components/game/QuizModal";
-import MascotPopup from "@/components/game/MascotPopup";
+const EngklekBoard = dynamic(() => import("@/components/game/EngklekBoard"), {
+    ssr: false,
+});
+const CountdownOverlay = dynamic(
+    () => import("@/components/game/CountdownOverlay"),
+    { ssr: false }
+);
+const HUDBar = dynamic(() => import("@/components/game/HUDBar"), {
+    ssr: false,
+});
+const QuizModal = dynamic(() => import("@/components/game/QuizModal"), {
+    ssr: false,
+});
+const MascotPopup = dynamic(() => import("@/components/game/MascotPopup"), {
+    ssr: false,
+});
 
 export default function GamePage() {
     const router = useRouter();
@@ -25,6 +37,7 @@ export default function GamePage() {
     const showMascot = useGameStore((s) => s.showMascot);
     const mascotLives = useGameStore((s) => s.mascotLives);
     const lastScoreGain = useGameStore((s) => s.lastScoreGain);
+    const wobbleKey = useGameStore((s) => s.wobbleKey);
     const setPhase = useGameStore((s) => s.setPhase);
     const throwStone = useGameStore((s) => s.throwStone);
     const nextPhase = useGameStore((s) => s.nextPhase);
@@ -33,6 +46,8 @@ export default function GamePage() {
     const answerQuestion = useGameStore((s) => s.answerQuestion);
     const fetchQuestions = useGameStore((s) => s.fetchQuestions);
     const dismissMascot = useGameStore((s) => s.dismissMascot);
+
+    const wobbleControls = useAnimation();
 
     const [showCountdown, setShowCountdown] = useState(true);
     const [animatingPath, setAnimatingPath] = useState<string[]>([]);
@@ -67,6 +82,15 @@ export default function GamePage() {
         if (phase === "game_over") {
             router.push("/game-over");
         }
+    }, [phase, router]);
+
+    // Redirect to result page on finished phase
+    const redirectedToResultRef = useRef(false);
+    useEffect(() => {
+        if (phase !== "finished") return;
+        if (redirectedToResultRef.current) return;
+        redirectedToResultRef.current = true;
+        router.push("/result");
     }, [phase, router]);
 
     // Countdown complete → go to idle
@@ -388,6 +412,17 @@ export default function GamePage() {
         phaseHandledRef.current = "";
     }, [resetGame, fetchQuestions, level]);
 
+    // Character wobble (screen shake) on wrong answer.
+    useEffect(() => {
+        if (wobbleKey <= 0) return;
+
+        wobbleControls.start({
+            x: [0, -10, 10, -7, 7, 0],
+            rotate: [0, -1.5, 1.5, -0.8, 0.8, 0],
+            transition: { duration: 0.45, ease: "easeInOut" },
+        });
+    }, [wobbleKey, wobbleControls]);
+
     if (!level) return null;
 
     const levelColors = {
@@ -454,11 +489,18 @@ export default function GamePage() {
                         {lastScoreGain && (
                             <motion.div
                                 key={`score-${Date.now()}`}
-                                initial={{ opacity: 1, y: 0, scale: 0.5 }}
-                                animate={{ opacity: 0, y: -60, scale: 1.2 }}
-                                exit={{ opacity: 0 }}
+                                initial={{
+                                    opacity: 0,
+                                    y: 14,
+                                    scale: 0.75,
+                                }}
+                                animate={{
+                                    opacity: 0,
+                                    y: -90,
+                                    scale: 1.2,
+                                }}
                                 transition={{ duration: 1.5, ease: "easeOut" }}
-                                className="absolute top-1/3 left-1/2 -translate-x-1/2 z-30"
+                                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none"
                             >
                                 <span className="font-fredoka text-3xl font-bold text-amber-500 drop-shadow-lg">
                                     +{lastScoreGain}
@@ -468,8 +510,12 @@ export default function GamePage() {
                     </AnimatePresence>
 
                     {/* Board */}
-                    <div className="relative w-full max-w-[360px]">
+                    <motion.div
+                        className="relative w-full max-w-[360px]"
+                        animate={wobbleControls}
+                    >
                         <EngklekBoard
+                            level={level}
                             onStoneAnimationComplete={
                                 handleStoneAnimationComplete
                             }
@@ -478,45 +524,9 @@ export default function GamePage() {
                             }
                             animatingPath={animatingPath}
                         />
-                    </div>
+                    </motion.div>
 
-                    {/* Finished overlay */}
-                    <AnimatePresence>
-                        {phase === "finished" && (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-3xl"
-                            >
-                                <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 mx-4 text-center shadow-2xl border border-white/50 max-w-sm">
-                                    <div className="text-5xl mb-4">🎉</div>
-                                    <h2 className="font-fredoka text-2xl font-bold text-green-600 mb-2">
-                                        Permainan Selesai!
-                                    </h2>
-                                    <p className="text-gray-500 text-sm mb-6">
-                                        Kamu telah menyelesaikan 5 jalan
-                                        engklek!
-                                    </p>
-                                    <div className="flex flex-col gap-3">
-                                        <button
-                                            onClick={() =>
-                                                router.push("/level-select")
-                                            }
-                                            className="w-full py-3 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold shadow-lg shadow-green-500/25 hover:shadow-xl transition-all active:scale-[0.98]"
-                                        >
-                                            🔄 Main Lagi
-                                        </button>
-                                        <button
-                                            onClick={() => router.push("/")}
-                                            className="w-full py-3 rounded-2xl bg-white border-2 border-gray-200 text-gray-600 font-bold hover:border-green-400 transition-all active:scale-[0.98]"
-                                        >
-                                            Menu Utama
-                                        </button>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                    {/* finished phase is handled by redirect to /result */}
                 </motion.div>
             )}
 

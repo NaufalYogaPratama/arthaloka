@@ -163,21 +163,29 @@ function getParabolicArc(
     // Stone starts from above the board, slightly to the left
     const startX = 40;
     const startY = -60;
-    const peakY = Math.min(startY, targetY) - 120; // Arc peak above both points
+    // Higher arc for farther throws (more distance -> higher peak).
+    const peakPadding = 120 + Math.abs(targetX - CENTER_X) * 0.25;
+    const peakY = Math.min(startY, targetY) - peakPadding; // Arc peak above both points
 
-    const steps = 10;
+    const easeInOutQuad = (t: number) =>
+        t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+    const steps = 12;
     const xKeyframes: number[] = [];
     const yKeyframes: number[] = [];
 
     for (let i = 0; i <= steps; i++) {
         const t = i / steps;
-        // Linear interpolation for X
-        const x = startX + (targetX - startX) * t;
+        const te = easeInOutQuad(t);
+
+        // Smooth interpolation for X
+        const x = startX + (targetX - startX) * te;
+
         // Parabolic interpolation for Y (quadratic bezier-like)
         const y =
-            (1 - t) * (1 - t) * startY +
-            2 * (1 - t) * t * peakY +
-            t * t * targetY;
+            (1 - te) * (1 - te) * startY +
+            2 * (1 - te) * te * peakY +
+            te * te * targetY;
         xKeyframes.push(x);
         yKeyframes.push(y);
     }
@@ -190,12 +198,14 @@ interface EngklekBoardProps {
     onStoneAnimationComplete?: () => void;
     onCharacterAnimationComplete?: () => void;
     animatingPath?: string[];
+    level?: "easy" | "medium" | "hard" | null;
 }
 
 export default function EngklekBoard({
     onStoneAnimationComplete,
     onCharacterAnimationComplete,
     animatingPath,
+    level,
 }: EngklekBoardProps) {
     const stonePosition = useGameStore((s) => s.stonePosition);
     const characterPosition = useGameStore((s) => s.characterPosition);
@@ -397,7 +407,7 @@ export default function EngklekBoard({
                             }}
                             transition={{
                                 duration: 1.2,
-                                ease: "easeOut",
+                                ease: "easeInOut",
                             }}
                             onAnimationComplete={() => {
                                 setStoneAnimating(false);
@@ -429,7 +439,13 @@ export default function EngklekBoard({
                         mass: 0.8,
                     }}
                 >
-                    👦
+                    {level === "easy"
+                        ? "🎒👦"
+                        : level === "medium"
+                            ? "👕👦"
+                            : level === "hard"
+                                ? "👔👦"
+                                : "👦"}
                 </motion.div>
             </div>
         </div>

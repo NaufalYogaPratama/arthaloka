@@ -53,6 +53,8 @@ export interface GameState {
 
     // Score animation
     lastScoreGain: number | null;
+    // Used to trigger a shake/wobble animation when answering wrong.
+    wobbleKey: number;
 
     // Actions
     setLevel: (level: "easy" | "medium" | "hard") => void;
@@ -182,6 +184,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     // Score animation
     lastScoreGain: null,
+    wobbleKey: 0,
 
     // Actions
     setLevel: (level) => set({ level }),
@@ -253,6 +256,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             } else {
                 // ❌ Wrong answer
                 const newLives = state.lives - 1;
+                const newWobbleKey = state.wobbleKey + 1;
 
                 set({
                     lives: newLives,
@@ -261,6 +265,7 @@ export const useGameStore = create<GameState>((set, get) => ({
                     collectedFacts: [...state.collectedFacts, educationalFact],
                     showMascot: true,
                     mascotLives: newLives,
+                    wobbleKey: newWobbleKey,
                 });
 
                 if (newLives <= 0) {
@@ -333,5 +338,6 @@ export const useGameStore = create<GameState>((set, get) => ({
             showMascot: false,
             mascotLives: 3,
             lastScoreGain: null,
+            wobbleKey: 0,
         }),
 }));

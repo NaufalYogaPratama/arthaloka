@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Nunito, Fredoka } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
 import "./globals.css";
+import AnimatedRoute from "@/components/layout/AnimatedRoute";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -32,7 +33,9 @@ export default function RootLayout({
       <body
         className={`${nunito.variable} ${fredoka.variable} font-sans antialiased`}
       >
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <AnimatedRoute>{children}</AnimatedRoute>
+        </SessionProvider>
       </body>
     </html>
   );
