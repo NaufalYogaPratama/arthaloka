@@ -60,10 +60,10 @@ export default function LevelSelectPage() {
     };
 
     return (
-        <main className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 relative overflow-hidden">
+        <main className="min-h-screen bg-brand-pattern-light bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 relative overflow-hidden">
             {/* Decorative circles */}
-            <div className="absolute top-[-50px] right-[-50px] w-[200px] h-[200px] rounded-full bg-green-200/30 blur-2xl" />
-            <div className="absolute bottom-[-80px] left-[-40px] w-[250px] h-[250px] rounded-full bg-teal-200/25 blur-3xl" />
+            <div className="absolute z-0 top-[-50px] right-[-50px] w-[200px] h-[200px] rounded-full bg-green-200/30 blur-2xl" />
+            <div className="absolute z-0 bottom-[-80px] left-[-40px] w-[250px] h-[250px] rounded-full bg-teal-200/25 blur-3xl" />
 
             <div className="relative z-10 max-w-4xl mx-auto px-4 py-12 md:py-20">
                 {/* Header */}

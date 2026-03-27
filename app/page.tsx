@@ -2,6 +2,7 @@
 
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import AppLogo from "@/components/ui/AppLogo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,45 +21,37 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-green-100 via-emerald-50 to-teal-100">
+    <main className="relative min-h-screen flex items-center justify-center overflow-hidden bg-brand-pattern-light bg-gradient-to-br from-green-100 via-emerald-50 to-teal-100">
       {/* Decorative background circles */}
-      <div className="absolute top-[-80px] left-[-60px] w-[250px] h-[250px] rounded-full bg-green-200/40 blur-2xl" />
-      <div className="absolute top-[20%] right-[-40px] w-[200px] h-[200px] rounded-full bg-teal-200/40 blur-2xl" />
-      <div className="absolute bottom-[-60px] left-[30%] w-[300px] h-[300px] rounded-full bg-emerald-200/30 blur-3xl" />
-      <div className="absolute bottom-[20%] right-[10%] w-[150px] h-[150px] rounded-full bg-lime-200/40 blur-2xl" />
-      <div className="absolute top-[60%] left-[10%] w-[120px] h-[120px] rounded-full bg-green-300/25 blur-xl" />
+      <div className="absolute top-[-80px] left-[-60px] w-[250px] h-[250px] rounded-full bg-green-200/40 blur-2xl z-0" />
+      <div className="absolute top-[20%] right-[-40px] w-[200px] h-[200px] rounded-full bg-teal-200/40 blur-2xl z-0" />
+      <div className="absolute bottom-[-60px] left-[30%] w-[300px] h-[300px] rounded-full bg-emerald-200/30 blur-3xl z-0" />
+      <div className="absolute bottom-[20%] right-[10%] w-[150px] h-[150px] rounded-full bg-lime-200/40 blur-2xl z-0" />
+      <div className="absolute top-[60%] left-[10%] w-[120px] h-[120px] rounded-full bg-green-300/25 blur-xl z-0" />
 
       {/* Decorative small circles */}
-      <div className="absolute top-[15%] left-[20%] w-4 h-4 rounded-full bg-green-300/60 animate-pulse" />
-      <div className="absolute top-[30%] right-[25%] w-3 h-3 rounded-full bg-teal-300/60 animate-pulse delay-500" />
-      <div className="absolute bottom-[25%] left-[15%] w-5 h-5 rounded-full bg-emerald-300/50 animate-pulse delay-1000" />
-      <div className="absolute top-[50%] right-[15%] w-3 h-3 rounded-full bg-lime-400/50 animate-pulse delay-700" />
+      <div className="absolute top-[15%] left-[20%] w-4 h-4 rounded-full bg-green-300/60 animate-pulse z-0" />
+      <div className="absolute top-[30%] right-[25%] w-3 h-3 rounded-full bg-teal-300/60 animate-pulse delay-500 z-0" />
+      <div className="absolute bottom-[25%] left-[15%] w-5 h-5 rounded-full bg-emerald-300/50 animate-pulse delay-1000 z-0" />
+      <div className="absolute top-[50%] right-[15%] w-3 h-3 rounded-full bg-lime-400/50 animate-pulse delay-700 z-0" />
 
       {/* Floating leaf emojis */}
-      <div className="absolute top-[10%] right-[30%] text-3xl animate-bounce opacity-30">
+      <div className="absolute top-[10%] right-[30%] text-3xl animate-bounce opacity-30 z-0">
         🌿
       </div>
-      <div className="absolute bottom-[15%] right-[20%] text-2xl animate-bounce delay-300 opacity-30">
+      <div className="absolute bottom-[15%] right-[20%] text-2xl animate-bounce delay-300 opacity-30 z-0">
         🍃
       </div>
-      <div className="absolute top-[40%] left-[8%] text-2xl animate-bounce delay-700 opacity-25">
+      <div className="absolute top-[40%] left-[8%] text-2xl animate-bounce delay-700 opacity-25 z-0">
         🌱
       </div>
 
       {/* Main card */}
       <div className="relative z-10 w-full max-w-md mx-4 px-8 py-12 rounded-3xl bg-white/70 backdrop-blur-xl shadow-xl border border-white/50 text-center">
-        {/* Engklek icon */}
-        <div className="text-6xl mb-4 drop-shadow-lg">🎯</div>
-
         {/* Logo */}
-        <h1 className="font-fredoka text-5xl md:text-6xl font-bold text-green-700 tracking-tight mb-2 drop-shadow-sm">
-          ArthaLoka
-        </h1>
-
-        {/* Tagline */}
-        <p className="text-lg md:text-xl text-green-600 font-semibold mb-10">
-          Belajar Keuangan, Main Engklek! 🎮
-        </p>
+        <div className="flex justify-center mb-10">
+          <AppLogo variant="horizontal" size="xl" />
+        </div>
 
         {/* Login buttons */}
         <div className="flex flex-col gap-4">

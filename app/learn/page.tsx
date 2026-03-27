@@ -28,8 +28,8 @@ export default function LearnPage() {
                     : "text-gray-600";
 
     return (
-        <main className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex flex-col items-center px-4 py-10 relative overflow-hidden">
-            <div className="absolute top-[-60px] left-[-40px] w-[200px] h-[200px] rounded-full bg-green-200/30 blur-2xl" />
+        <main className="min-h-screen bg-brand-pattern-light bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex flex-col items-center px-4 py-10 relative overflow-hidden">
+            <div className="absolute z-0 top-[-60px] left-[-40px] w-[200px] h-[200px] rounded-full bg-green-200/30 blur-2xl" />
             <div className="relative z-10 w-full max-w-3xl">
                 <h1 className="font-fredoka text-3xl font-bold text-gray-800 text-center mb-4">
                     📚 Ruang Belajar

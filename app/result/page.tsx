@@ -9,6 +9,7 @@ import { useGameStore } from "@/store/gameStore";
 import LeaderboardTable, {
     type LeaderboardRow,
 } from "@/components/ui/LeaderboardTable";
+import AppLogo from "@/components/ui/AppLogo";
 
 type RecordResponse = {
     isNewRecord: boolean;
@@ -61,10 +62,10 @@ export default function ResultPage() {
 
     const levelLabel = level
         ? ({
-              easy: "Easy",
-              medium: "Medium",
-              hard: "Hard",
-          } as const)[level]
+            easy: "Easy",
+            medium: "Medium",
+            hard: "Hard",
+        } as const)[level]
         : "—";
 
     const perfectClear = phase === "finished" && livesRemaining === 3;
@@ -187,8 +188,10 @@ export default function ResultPage() {
 
     if (phase !== "finished" || !level) {
         return (
-            <main className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center px-4">
-                <div className="bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl p-8 max-w-md text-center">
+            <main className="min-h-screen bg-brand-pattern-light bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center px-4 relative">
+                <div className="absolute z-0 top-[-60px] left-[-40px] w-[200px] h-[200px] rounded-full bg-green-200/30 blur-2xl" />
+                <div className="absolute z-0 bottom-[-60px] right-[-40px] w-[220px] h-[220px] rounded-full bg-teal-200/25 blur-3xl" />
+                <div className="bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl p-8 max-w-md text-center relative z-10">
                     <div className="text-6xl mb-3">🎯</div>
                     <h1 className="font-fredoka text-2xl font-bold text-gray-800 mb-2">
                         Hasil belum siap
@@ -209,10 +212,10 @@ export default function ResultPage() {
     }
 
     return (
-        <main className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex flex-col relative overflow-hidden">
+        <main className="min-h-screen bg-brand-pattern-light bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex flex-col relative overflow-hidden">
             {/* Decorative circles */}
-            <div className="absolute top-[-60px] left-[-40px] w-[200px] h-[200px] rounded-full bg-green-200/30 blur-2xl" />
-            <div className="absolute bottom-[-60px] right-[-40px] w-[220px] h-[220px] rounded-full bg-teal-200/25 blur-3xl" />
+            <div className="absolute z-0 top-[-60px] left-[-40px] w-[200px] h-[200px] rounded-full bg-green-200/30 blur-2xl" />
+            <div className="absolute z-0 bottom-[-60px] right-[-40px] w-[220px] h-[220px] rounded-full bg-teal-200/25 blur-3xl" />
 
             <div className="relative z-10 max-w-4xl mx-auto px-4 py-10 md:py-14 w-full">
                 <div className="flex flex-col items-center text-center">
@@ -281,11 +284,10 @@ export default function ResultPage() {
                         </p>
                         <div className="flex items-baseline justify-center gap-3">
                             <span
-                                className={`font-fredoka text-6xl md:text-7xl font-bold text-amber-500 drop-shadow-lg ${
-                                    record?.isNewRecord
+                                className={`font-fredoka text-6xl md:text-7xl font-bold text-amber-500 drop-shadow-lg ${record?.isNewRecord
                                         ? "animate-glowPulse"
                                         : ""
-                                }`}
+                                    }`}
                             >
                                 {totalScore}
                             </span>
@@ -382,6 +384,10 @@ export default function ResultPage() {
                         🔄 Main Lagi
                     </button>
                 </section>
+
+                <div className="flex justify-center mt-10 mb-4 pointer-events-none">
+                    <AppLogo variant="horizontal" size="sm" className="opacity-60 grayscale hover:grayscale-0 transition-all" />
+                </div>
             </div>
         </main>
     );
