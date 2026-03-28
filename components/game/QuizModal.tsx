@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import { QUIZ_BADGE } from "@/lib/assets";
 
 interface QuizModalProps {
     question: {
@@ -114,16 +116,21 @@ export default function QuizModal({
             >
                 {/* Quiz type badge */}
                 <div className="flex justify-center mb-4">
-                    <span
-                        className={`px-4 py-1.5 rounded-full text-sm font-bold shadow-sm ${quizType === "quiz1"
-                                ? "bg-blue-100 text-blue-700"
-                                : "bg-amber-100 text-amber-700"
-                            }`}
-                    >
-                        {quizType === "quiz1"
-                            ? "🦘 Quiz Maju"
-                            : "🏠 Quiz Ambil Batu"}
-                    </span>
+                    {(() => {
+                        const badge = QUIZ_BADGE[quizType];
+                        const badgeDisplayH = 36;
+                        const badgeDisplayW = Math.round(badgeDisplayH * (badge.width / badge.height));
+                        return (
+                            <Image
+                                src={badge.src}
+                                alt={quizType === 'quiz1' ? 'Quiz Maju' : 'Quiz Ambil Batu'}
+                                width={badgeDisplayW}
+                                height={badgeDisplayH}
+                                className="object-contain drop-shadow-sm"
+                                style={{ width: badgeDisplayW, height: badgeDisplayH }}
+                            />
+                        );
+                    })()}
                 </div>
 
                 {/* Question text */}
@@ -141,8 +148,8 @@ export default function QuizModal({
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all duration-200 ${getButtonStyle(
                                 index
                             )} ${selectedIndex !== null
-                                    ? "cursor-default"
-                                    : "cursor-pointer"
+                                ? "cursor-default"
+                                : "cursor-pointer"
                                 }`}
                         >
                             {/* Letter circle */}
@@ -169,8 +176,8 @@ export default function QuizModal({
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className={`mt-4 p-3 rounded-2xl text-center text-sm font-semibold ${result.correct
-                                ? "bg-green-50 text-green-700 border border-green-200"
-                                : "bg-red-50 text-red-700 border border-red-200"
+                            ? "bg-green-50 text-green-700 border border-green-200"
+                            : "bg-red-50 text-red-700 border border-red-200"
                             }`}
                     >
                         {result.correct

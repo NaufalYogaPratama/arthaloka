@@ -1,120 +1,133 @@
-"use client";
+'use client'
 
-import { motion } from "framer-motion";
+import Image from 'next/image'
+import { LEVEL_ARTWORK, LEVEL_ICON } from '@/lib/assets'
+import { getCharacterFull } from '@/lib/assets'
+import type { GameLevel } from '@/types/game'
 
-import Image from "next/image";
-import { getCharacterFull } from "@/lib/assets";
-import type { GameLevel } from "@/types/game";
-
-interface LevelCardProps {
-    levelKey: GameLevel;
-    emoji: string;
-    title: string;
-    topics: string;
-    description: string;
-    color: "green" | "blue" | "red";
-    onClick: () => void;
+const LEVEL_CONFIG: Record<GameLevel, {
+    label: string
+    tagline: string
+    topics: string[]
+    colorClass: string
+    borderClass: string
+    bgClass: string
+    badgeClass: string
+}> = {
+    easy: {
+        label: 'Easy',
+        tagline: 'Mulai perjalanan finansialmu!',
+        topics: ['💰 Budgeting', '🏦 Menabung', '💳 Kebutuhan vs Keinginan'],
+        colorClass: 'text-green-700',
+        borderClass: 'border-green-200 hover:border-green-400',
+        bgClass: 'bg-gradient-to-br from-green-50 to-emerald-50',
+        badgeClass: 'bg-green-100 text-green-800',
+    },
+    medium: {
+        label: 'Medium',
+        tagline: 'Hadapi tantangan keuangan!',
+        topics: ['😰 Impulsive Buying', '💳 Pay Later', '📊 Hutang'],
+        colorClass: 'text-blue-700',
+        borderClass: 'border-blue-200 hover:border-blue-400',
+        bgClass: 'bg-gradient-to-br from-blue-50 to-sky-50',
+        badgeClass: 'bg-blue-100 text-blue-800',
+    },
+    hard: {
+        label: 'Hard',
+        tagline: 'Kuasai investasi & risiko!',
+        topics: ['⚠️ Pinjol Ilegal', '📈 Investasi', '🔢 Bunga Berbunga'],
+        colorClass: 'text-red-700',
+        borderClass: 'border-red-200 hover:border-red-400',
+        bgClass: 'bg-gradient-to-br from-red-50 to-orange-50',
+        badgeClass: 'bg-red-100 text-red-800',
+    },
 }
 
-const colorMap = {
-    green: {
-        bg: "bg-gradient-to-br from-green-50 to-emerald-50",
-        border: "border-green-200",
-        hoverBorder: "hover:border-green-400",
-        title: "text-green-700",
-        emoji_bg: "bg-green-100",
-        tag: "bg-green-100 text-green-700",
-        btn: "bg-gradient-to-r from-green-500 to-emerald-500 shadow-green-500/25 hover:shadow-green-500/40",
-    },
-    blue: {
-        bg: "bg-gradient-to-br from-blue-50 to-sky-50",
-        border: "border-blue-200",
-        hoverBorder: "hover:border-blue-400",
-        title: "text-blue-700",
-        emoji_bg: "bg-blue-100",
-        tag: "bg-blue-100 text-blue-700",
-        btn: "bg-gradient-to-r from-blue-500 to-sky-500 shadow-blue-500/25 hover:shadow-blue-500/40",
-    },
-    red: {
-        bg: "bg-gradient-to-br from-red-50 to-orange-50",
-        border: "border-red-200",
-        hoverBorder: "hover:border-red-400",
-        title: "text-red-700",
-        emoji_bg: "bg-red-100",
-        tag: "bg-red-100 text-red-700",
-        btn: "bg-gradient-to-r from-red-500 to-orange-500 shadow-red-500/25 hover:shadow-red-500/40",
-    },
-};
+interface LevelCardProps {
+    levelKey: GameLevel
+    emoji?: string // unused now, for compatibility with old props if any
+    title?: string
+    topics?: string
+    description?: string
+    color?: string
+    onClick: () => void
+}
 
-export default function LevelCard({
-    levelKey,
-    emoji,
-    title,
-    topics,
-    description,
-    color,
-    onClick,
-}: LevelCardProps) {
-    const c = colorMap[color];
-    const charAsset = getCharacterFull(levelKey);
-    const displayH = 140;
-    const displayW = Math.round(displayH * (charAsset.width / charAsset.height));
+export default function LevelCard({ levelKey, onClick }: LevelCardProps) {
+    const cfg = LEVEL_CONFIG[levelKey]
+    const artwork = LEVEL_ARTWORK[levelKey]
+    const icon = LEVEL_ICON[levelKey]
+    const char = getCharacterFull(levelKey)
+
+    // Displayed sizes — maintain aspect ratio
+    // Artwork: display height 120px
+    const artworkH = 120
+    const artworkW = Math.round(artworkH * (artwork.width / artwork.height))
+
+    // Char preview: height 100px
+    const charH = 100
+    const charW = Math.round(charH * (char.width / char.height))
 
     return (
-        <motion.div
-            whileHover={{ scale: 1.04, y: -4 }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        <button
             onClick={onClick}
-            className={`cursor-pointer rounded-3xl p-6 border-2 ${c.bg} ${c.border} ${c.hoverBorder} shadow-md hover:shadow-xl transition-shadow duration-300 relative overflow-hidden`}
+            className={`w-full text-left rounded-2xl p-5 border-2 ${cfg.borderClass} ${cfg.bgClass}
+                  shadow-sm hover:shadow-md active:scale-[0.98]
+                  transition-all duration-200 flex items-center gap-4`}
         >
-            <div className="flex justify-between items-start mb-4">
-                {/* Emoji */}
-                <div
-                    className={`w-14 h-14 rounded-2xl ${c.emoji_bg} flex items-center justify-center text-2xl`}
-                >
-                    {emoji}
-                </div>
-            </div>
-
-            {/* Title */}
-            <h3
-                className={`font-fredoka text-2xl font-bold ${c.title} text-center mb-2`}
-            >
-                {title}
-            </h3>
-
-            {/* Topics tag */}
-            <div className="flex justify-center mb-3">
-                <span
-                    className={`text-xs font-bold px-3 py-1 rounded-full ${c.tag}`}
-                >
-                    {topics}
-                </span>
-            </div>
-
-            {/* Description */}
-            <p className="text-sm text-gray-500 text-center leading-relaxed mb-5">
-                {description}
-            </p>
-
-            <div className="flex justify-center mb-6">
+            {/* Left: Artwork illustration */}
+            <div className="flex-shrink-0 w-[110px] sm:w-[130px] rounded-xl overflow-hidden bg-white/50 flex justify-center items-center">
                 <Image
-                    src={charAsset.src}
-                    alt={`Karakter level ${levelKey}`}
-                    width={displayW}
-                    height={displayH}
-                    className="object-contain drop-shadow-md"
-                    style={{ width: displayW, height: displayH }}
+                    src={artwork.src}
+                    alt={`Level ${cfg.label} artwork`}
+                    width={artworkW}
+                    height={artworkH}
+                    className="object-contain max-h-[120px]"
+                    style={{ width: 'auto', height: '100%' }}
                 />
             </div>
 
-            {/* Play button */}
-            <div
-                className={`w-full py-3 rounded-2xl ${c.btn} text-white font-bold text-center text-sm shadow-lg transition-all duration-200`}
-            >
-                Mulai Bermain →
+            {/* Center: Info */}
+            <div className="flex-1 min-w-0">
+                {/* Header: Icon + Label */}
+                <div className="flex items-center gap-2 mb-1">
+                    <Image
+                        src={icon.src}
+                        alt={`Icon ${cfg.label}`}
+                        width={28}
+                        height={28}
+                        className="object-contain rounded-full"
+                        style={{ width: 28, height: 28 }}
+                    />
+                    <span className={`text-xl font-black ${cfg.colorClass}`}>{cfg.label}</span>
+                </div>
+
+                <p className="text-gray-500 text-xs mb-3">{cfg.tagline}</p>
+
+                {/* Topics */}
+                <div className="flex flex-wrap gap-1">
+                    {cfg.topics.map(t => (
+                        <span key={t} className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${cfg.badgeClass}`}>
+                            {t}
+                        </span>
+                    ))}
+                </div>
             </div>
-        </motion.div>
-    );
+
+            {/* Right: Character preview */}
+            <div className="flex-shrink-0 hidden sm:block">
+                <Image
+                    src={char.src}
+                    alt={`Karakter ${levelKey}`}
+                    width={charW}
+                    height={charH}
+                    className="object-contain"
+                    style={{ width: charW, height: charH }}
+                />
+            </div>
+
+            {/* Arrow */}
+            <span className={`text-2xl ${cfg.colorClass} flex-shrink-0`}>→</span>
+        </button>
+    )
 }

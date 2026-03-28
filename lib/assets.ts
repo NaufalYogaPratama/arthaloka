@@ -127,3 +127,55 @@ export function getArrowAsset(direction: ArrowDirection, style: ArrowStyle) {
         ...dims[direction],
     }
 }
+
+// ── Level Assets ─────────────────────────────────────────
+export const LEVEL_ARTWORK: Record<GameLevel, { src: string; width: number; height: number }> = {
+    easy: { src: '/assets/easy-artwork.png', width: 730, height: 745 },
+    medium: { src: '/assets/medium-artwork.png', width: 765, height: 610 },
+    hard: { src: '/assets/hard-artwork.png', width: 980, height: 615 },
+}
+
+// icon-normal.png = level Medium (nama file berbeda dari konvensi)
+export const LEVEL_ICON: Record<GameLevel, { src: string; width: number; height: number }> = {
+    easy: { src: '/assets/icon-easy.png', width: 415, height: 425 },
+    medium: { src: '/assets/icon-normal.png', width: 415, height: 425 },
+    hard: { src: '/assets/icon-hard.png', width: 415, height: 425 },
+}
+
+// ── Quiz Badge ────────────────────────────────────────────
+export const QUIZ_BADGE = {
+    quiz1: { src: '/assets/quiz-maju-badge.png', width: 570, height: 180 },
+    quiz2: { src: '/assets/quiz-ambil-badge.png', width: 675, height: 180 },
+} as const
+
+// ── HUD Hearts ───────────────────────────────────────────
+// Gambar hearts menampilkan 3 hearts sekaligus dalam 1 image
+// Pilih image berdasarkan jumlah lives yang tersisa
+export function getHeartsAsset(lives: number): { src: string; width: number; height: number } {
+    if (lives >= 3) return { src: '/assets/full-hearts.png', width: 310, height: 255 }
+    if (lives === 1) return { src: '/assets/pulsing-hearts.png', width: 310, height: 255 }
+    return { src: '/assets/lost-hearts.png', width: 310, height: 255 }
+}
+
+// ── Combo Badge ───────────────────────────────────────────
+// Gambar combo badge menampilkan teks combo yang sudah baked-in di gambar
+// Gunakan sebagai background/visual, tapi tetap render teks dinamis di atasnya via CSS
+export function getComboBadgeAsset(combo: number): { src: string; width: number; height: number } | null {
+    if (combo < 2) return null
+    if (combo < 4) return { src: '/assets/2xcombo-badge.png', width: 360, height: 95 }
+    if (combo < 6) return { src: '/assets/4xcombo-badge.png', width: 330, height: 95 }
+    if (combo < 8) return { src: '/assets/6xcombo-badge.png', width: 355, height: 95 }
+    return { src: '/assets/8xcombo-badge.png', width: 410, height: 95 }
+}
+
+// ── Score Popup ───────────────────────────────────────────
+// Pilih gambar score popup berdasarkan poin yang didapat
+export function getScorePopupAsset(pts: number): { src: string; width: number; height: number } {
+    if (pts >= 200) return { src: '/assets/+200-score.png', width: 400, height: 225 }
+    if (pts >= 150) return { src: '/assets/+150-score.png', width: 340, height: 215 }
+    return { src: '/assets/+100-score.png', width: 315, height: 205 }
+}
+
+// ── Result Banners ────────────────────────────────────────
+export const NEW_RECORD_BANNER = { src: '/assets/new-record-banner.png', width: 1345, height: 305 }
+export const PERFECT_CLEAR_BANNER = { src: '/assets/perfect-clear-banner.png', width: 865, height: 165 }

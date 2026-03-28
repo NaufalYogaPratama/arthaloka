@@ -10,6 +10,8 @@ import LeaderboardTable, {
     type LeaderboardRow,
 } from "@/components/ui/LeaderboardTable";
 import AppLogo from "@/components/ui/AppLogo";
+import Image from "next/image";
+import { NEW_RECORD_BANNER, PERFECT_CLEAR_BANNER } from "@/lib/assets";
 
 type RecordResponse = {
     isNewRecord: boolean;
@@ -228,22 +230,30 @@ export default function ResultPage() {
 
                     {/* NEW RECORD banner */}
                     {record?.isNewRecord && (
-                        <div className="w-full max-w-xl mb-4">
-                            <div className="animate-popIn animate-glowPulse bg-amber-100/90 border border-amber-200 text-amber-800 font-bold rounded-2xl px-4 py-3 shadow-lg shadow-amber-500/10 flex items-center justify-center gap-2">
-                                <span className="text-lg md:text-xl">
-                                    🌟 NEW RECORD! 🌟
-                                </span>
-                            </div>
+                        <div className="w-full max-w-xl animate-[popIn_0.4s_cubic-bezier(0.34,1.56,0.64,1)] mb-4">
+                            <Image
+                                src={NEW_RECORD_BANNER.src}
+                                alt="New Record!"
+                                width={NEW_RECORD_BANNER.width}
+                                height={NEW_RECORD_BANNER.height}
+                                className="w-full h-auto object-contain"
+                                style={{ width: '100%', height: 'auto' }}
+                                priority
+                            />
                         </div>
                     )}
 
                     {/* PERFECT CLEAR banner */}
                     {perfectClear && (
-                        <div className="w-full max-w-xl mb-5">
-                            <div className="bg-green-100/90 border border-green-200 text-green-800 font-bold rounded-2xl px-4 py-3 shadow-lg shadow-green-500/10">
-                                ⭐ PERFECT CLEAR! +{PERFECT_CLEAR_BONUS} Bonus
-                                Poin!
-                            </div>
+                        <div className="w-full max-w-xl mb-4">
+                            <Image
+                                src={PERFECT_CLEAR_BANNER.src}
+                                alt="Perfect Clear!"
+                                width={PERFECT_CLEAR_BANNER.width}
+                                height={PERFECT_CLEAR_BANNER.height}
+                                className="w-full h-auto object-contain drop-shadow-lg"
+                                style={{ width: '100%', height: 'auto' }}
+                            />
                         </div>
                     )}
 
@@ -285,8 +295,8 @@ export default function ResultPage() {
                         <div className="flex items-baseline justify-center gap-3">
                             <span
                                 className={`font-fredoka text-6xl md:text-7xl font-bold text-amber-500 drop-shadow-lg ${record?.isNewRecord
-                                        ? "animate-glowPulse"
-                                        : ""
+                                    ? "animate-glowPulse"
+                                    : ""
                                     }`}
                             >
                                 {totalScore}

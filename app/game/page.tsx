@@ -25,6 +25,7 @@ const QuizModal = dynamic(() => import("@/components/game/QuizModal"), {
 const MascotPopup = dynamic(() => import("@/components/game/MascotPopup"), {
     ssr: false,
 });
+import { ScorePopup } from "@/components/game/ScorePopup";
 
 export default function GamePage() {
     const router = useRouter();
@@ -55,6 +56,7 @@ export default function GamePage() {
     const [animatingPath, setAnimatingPath] = useState<string[]>([]);
     const [statusText, setStatusText] = useState("");
     const [showQuiz, setShowQuiz] = useState(false);
+    const [scorePopupKey, setScorePopupKey] = useState(0);
     const [currentQuizType, setCurrentQuizType] = useState<"quiz1" | "quiz2">(
         "quiz1"
     );
@@ -389,6 +391,7 @@ export default function GamePage() {
         async (selectedIndex: number) => {
             const res = await answerQuestion(selectedIndex);
             if (res.correct) {
+                setScorePopupKey((prev) => prev + 1);
                 setCharacterExpression("correct");
                 setTimeout(() => {
                     const currentPhase = useGameStore.getState().phase;
@@ -582,8 +585,7 @@ export default function GamePage() {
                     />
                 )}
             </AnimatePresence>
-
-            {/* Mascot Popup */}
+            <ScorePopup pts={lastScoreGain ?? 0} triggerKey={scorePopupKey} />
             <AnimatePresence>
                 {showMascot && (
                     <MascotPopup

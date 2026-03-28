@@ -1,8 +1,9 @@
-"use client";
+'use client'
 
-import { motion, AnimatePresence } from "framer-motion";
-import { useGameStore } from "@/store/gameStore";
-import { getMultiplier } from "@/lib/scoring";
+import Image from 'next/image'
+import { useGameStore } from '@/store/gameStore'
+import { getHeartsAsset, getComboBadgeAsset } from '@/lib/assets'
+import { getMultiplier } from '@/lib/scoring'
 
 export default function HUDBar() {
     const lives = useGameStore((s) => s.lives);
@@ -11,57 +12,73 @@ export default function HUDBar() {
     const questionIdx = useGameStore((s) => s.questionIdx);
     const combo = useGameStore((s) => s.combo);
 
-    const multiplier = getMultiplier(combo);
+    const heartsAsset = getHeartsAsset(lives)
+    const comboBadge = getComboBadgeAsset(combo)
+
+    // Hearts display: height 36px
+    const heartsH = 36
+    const heartsW = Math.round(heartsH * (heartsAsset.width / heartsAsset.height))
+
+    // Combo badge display: height 32px
+    const comboH = 32
+    const comboW = comboBadge
+        ? Math.round(comboH * (comboBadge.width / comboBadge.height))
+        : 0
 
     return (
-        <div className="w-full bg-white/80 backdrop-blur-md border-b border-green-100 px-3 py-2 flex items-center justify-between gap-2 z-50">
-            {/* Lives */}
-            <div className="flex items-center gap-0.5">
-                {[0, 1, 2].map((i) => (
-                    <span
-                        key={i}
-                        className={`text-lg transition-all duration-300 ${i < lives
-                                ? "opacity-100"
-                                : "opacity-30 grayscale"
-                            }`}
-                    >
-                        ❤️
-                    </span>
-                ))}
-            </div>
+        <div className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100
+                    px-4 py-2 flex items-center justify-between shadow-sm">
 
-            {/* Score */}
-            <div className="flex items-center gap-1">
-                <span className="text-xs text-gray-400 font-medium">Poin</span>
-                <span className="font-fredoka text-xl font-bold text-amber-500 min-w-[50px] text-center">
-                    {score}
-                </span>
-            </div>
-
-            {/* Round & Question */}
-            <div className="flex flex-col items-center text-xs leading-tight">
-                <span className="text-gray-500 font-semibold">
-                    Jalan {roundNum + 1}/5
-                </span>
-                <span className="text-gray-400">
-                    Soal {Math.min(questionIdx + 1, 10)}/10
-                </span>
-            </div>
-
-            {/* Combo Badge */}
-            <AnimatePresence>
-                {combo >= 2 && (
-                    <motion.div
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0, opacity: 0 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                        className="bg-gradient-to-r from-orange-400 to-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg shadow-orange-500/30 whitespace-nowrap"
-                    >
-                        🔥 {combo}x COMBO · {multiplier}× pts
-                    </motion.div>
+            {/* LEFT: Lives */}
+            <div className="flex items-center gap-2">
+                <Image
+                    src={heartsAsset.src}
+                    alt={`${lives} nyawa tersisa`}
+                    width={heartsW}
+                    height={heartsH}
+                    className="object-contain"
+                    style={{ width: heartsW, height: heartsH }}
+                    priority
+                />
+                {/* Tambahkan pulsing ring jika lives === 1 */}
+                {lives === 1 && (
+                    <span className="text-xs text-red-500 font-bold animate-pulse">!</span>
                 )}
-            </AnimatePresence>
+            </div>
+
+            {/* CENTER: Score */}
+            <div className="text-center">
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wide">SKOR</p>
+                <p className="text-xl font-black text-amber-500 leading-tight font-fredoka">
+                    {score.toLocaleString('id-ID')}
+                </p>
+            </div>
+
+            {/* RIGHT: Round + Question info */}
+            <div className="text-right">
+                <p className="text-[10px] text-gray-400 font-bold">Jalan {roundNum + 1}/5</p>
+                <p className="text-[10px] text-gray-400 font-bold">Soal {Math.min(questionIdx + 1, 10)}/10</p>
+            </div>
+
+            {/* BOTTOM ROW: Combo badge (kondisional) */}
+            {comboBadge && (
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[85%]
+                        z-20 pt-1">
+                    <div className="relative flex justify-center items-center">
+                        <Image
+                            src={comboBadge.src}
+                            alt={`${combo}x combo`}
+                            width={comboW}
+                            height={comboH}
+                            className="object-contain drop-shadow-md"
+                            style={{ width: comboW, height: comboH }}
+                        />
+                        <span className="absolute text-white font-black text-sm drop-shadow-md -mt-1" style={{ textShadow: "1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 1px 0 #000, 1px 0 0 #000, 0 -1px 0 #000, -1px 0 0 #000" }}>
+                            {combo}x
+                        </span>
+                    </div>
+                </div>
+            )}
         </div>
-    );
+    )
 }
