@@ -3,6 +3,9 @@
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useGameStore } from "@/store/gameStore";
+import Image from "next/image";
+import { GAME_OVER_ILLUSTRATION } from "@/lib/assets";
+import { MascotImage } from "@/components/ui/MascotImage";
 
 export default function GameOverPage() {
     const router = useRouter();
@@ -19,6 +22,10 @@ export default function GameOverPage() {
         router.push("/game");
     };
 
+    const handleHome = () => {
+        router.push("/");
+    };
+
     return (
         <main className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-pink-50 flex items-center justify-center relative overflow-hidden">
             {/* Decorative circles */}
@@ -32,74 +39,57 @@ export default function GameOverPage() {
                 transition={{ type: "spring", stiffness: 250, damping: 20 }}
                 className="relative z-10 bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8 max-w-sm mx-4 text-center"
             >
-                {/* Orang utan mascot with bounce */}
-                <motion.div
-                    animate={{
-                        y: [0, -20, 0, -12, 0],
-                    }}
-                    transition={{
-                        duration: 1.5,
-                        repeat: Infinity,
-                        repeatDelay: 2,
-                    }}
-                    className="text-8xl mb-4"
-                >
-                    🦧
-                </motion.div>
+                {/* Hero Illustration */}
+                <div className="w-full rounded-2xl overflow-hidden mb-4 relative drop-shadow-md">
+                    <Image
+                        src={GAME_OVER_ILLUSTRATION.src}
+                        alt="Game Over"
+                        width={GAME_OVER_ILLUSTRATION.width}
+                        height={GAME_OVER_ILLUSTRATION.height}
+                        className="w-full h-auto object-cover"
+                        style={{ width: '100%', height: 'auto' }}
+                        priority
+                    />
+
+                    {/* Mascot sedih overlay di pojok bawah kanan gambar */}
+                    <div className="absolute bottom-2 right-2">
+                        <MascotImage variant="sedih" displayHeight={100} />
+                    </div>
+                </div>
 
                 {/* Game Over title */}
                 <h1 className="font-fredoka text-3xl font-bold text-red-500 mb-2">
-                    Game Over
+                    Game Over!
                 </h1>
 
                 {/* Motivational message */}
-                <p className="text-gray-600 text-base mb-2">
-                    Jangan menyerah! Setiap kesalahan adalah pelajaran berharga.
-                </p>
-                <p className="text-gray-400 text-sm mb-6">
-                    &quot;Gagal itu biasa, yang penting kamu belajar dan mencoba
-                    lagi!&quot; 💪
+                <p className="text-gray-600 font-medium text-sm mb-6">
+                    Nyawa habis! Tapi jangan menyerah ya!
                 </p>
 
                 {/* Score card */}
                 <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 mb-6">
                     <p className="text-sm text-amber-600 font-medium mb-1">
-                        Poin yang dikumpulkan
+                        Poin dikumpulkan
                     </p>
                     <p className="font-fredoka text-4xl font-bold text-amber-500">
                         {score}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                        Level: {levelLabel}
-                    </p>
-                </div>
-
-                {/* Hearts display (all gone) */}
-                <div className="flex justify-center gap-1 mb-6">
-                    <span className="text-2xl opacity-30 grayscale">❤️</span>
-                    <span className="text-2xl opacity-30 grayscale">❤️</span>
-                    <span className="text-2xl opacity-30 grayscale">❤️</span>
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex flex-col gap-3">
+                <div className="flex gap-3 mt-6">
                     <button
                         onClick={handleRestart}
-                        className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-orange-400 to-red-500 text-white font-bold text-lg shadow-lg shadow-orange-500/25 hover:shadow-xl transition-all duration-200 active:scale-[0.98]"
+                        className="flex-1 bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-extrabold text-base py-3.5 px-5 rounded-2xl transition-all duration-150 flex items-center justify-center gap-2 shadow-sm"
                     >
                         🔄 Coba Lagi!
                     </button>
                     <button
-                        onClick={() => router.push("/level-select")}
-                        className="w-full py-3 rounded-2xl bg-white border-2 border-gray-200 text-gray-600 font-bold hover:border-orange-400 transition-all duration-200 active:scale-[0.98]"
+                        onClick={handleHome}
+                        className="flex-1 bg-white hover:bg-gray-50 active:scale-95 text-gray-700 font-extrabold text-base py-3.5 px-5 rounded-2xl border-2 border-gray-200 transition-all duration-150 flex items-center justify-center gap-2"
                     >
-                        📋 Pilih Level Lain
-                    </button>
-                    <button
-                        onClick={() => router.push("/")}
-                        className="w-full py-3 rounded-2xl text-gray-400 font-medium text-sm hover:text-gray-600 transition-colors"
-                    >
-                        Menu Utama
+                        🏠 Menu
                     </button>
                 </div>
             </motion.div>

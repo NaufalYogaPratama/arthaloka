@@ -1,4 +1,6 @@
 import type React from "react";
+import Image from "next/image";
+import { getMedalIcon } from "@/lib/assets";
 
 export type LeaderboardRow = {
     rank: number;
@@ -49,32 +51,42 @@ export default function LeaderboardTable({
                 <tbody>
                     {rows.map((row) => {
                         const isCurrent = row.userId === currentUserId;
-                        const medal =
-                            row.rank === 1
-                                ? "🥇"
-                                : row.rank === 2
-                                    ? "🥈"
-                                    : row.rank === 3
-                                        ? "🥉"
-                                        : null;
+                        const medal = getMedalIcon(row.rank);
+                        const medalDisplaySize = 28;
                         return (
                             <tr
                                 key={row.userId + row.rank}
                                 className={
                                     isCurrent
-                                        ? "bg-blue-100/80"
-                                        : "hover:bg-gray-50/60"
+                                        ? "bg-blue-100/80 font-bold"
+                                        : row.rank <= 3
+                                            ? "hover:bg-gray-50/60 font-bold"
+                                            : "hover:bg-gray-50/60 font-medium"
                                 }
                             >
-                                <td className="px-4 py-3 font-bold text-gray-700">
-                                    <span className="inline-flex items-center gap-2">
-                                        <span>{medal ? medal : row.rank}</span>
-                                    </span>
+                                <td className="px-4 py-3">
+                                    <div className="flex justify-start flex-shrink-0 w-8">
+                                        {medal ? (
+                                            <Image
+                                                src={medal.src}
+                                                alt={`Rank ${row.rank}`}
+                                                width={Math.round(medalDisplaySize * (medal.width / medal.height))}
+                                                height={medalDisplaySize}
+                                                className="object-contain"
+                                                style={{
+                                                    width: Math.round(medalDisplaySize * (medal.width / medal.height)),
+                                                    height: medalDisplaySize
+                                                }}
+                                            />
+                                        ) : (
+                                            <span className="text-sm text-gray-500 font-bold inline-block px-1">{row.rank}</span>
+                                        )}
+                                    </div>
                                 </td>
-                                <td className="px-4 py-3 font-semibold text-gray-800">
-                                    {row.playerName}
+                                <td className={`px-4 py-3 font-semibold ${row.rank === 1 ? 'text-amber-700' : row.rank === 2 ? 'text-gray-600' : row.rank === 3 ? 'text-orange-700' : 'text-gray-800'}`}>
+                                    {row.playerName} {isCurrent && <span className="text-blue-600 text-xs ml-1">(Kamu)</span>}
                                 </td>
-                                <td className="px-4 py-3 text-right font-fredoka text-amber-500 font-bold">
+                                <td className={`px-4 py-3 text-right font-fredoka font-black ${row.rank === 1 ? 'text-amber-600' : 'text-amber-500'}`}>
                                     {row.highestScore}
                                 </td>
                                 <td className="px-4 py-3 text-right text-xs text-gray-500">

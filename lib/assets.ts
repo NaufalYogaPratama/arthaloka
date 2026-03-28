@@ -179,3 +179,66 @@ export function getScorePopupAsset(pts: number): { src: string; width: number; h
 // ── Result Banners ────────────────────────────────────────
 export const NEW_RECORD_BANNER = { src: '/assets/new-record-banner.png', width: 1345, height: 305 }
 export const PERFECT_CLEAR_BANNER = { src: '/assets/perfect-clear-banner.png', width: 865, height: 165 }
+
+// ── Result / Trophy ───────────────────────────────────────
+export const VICTORY_ILLUSTRATION = { src: '/assets/victory-ilustrasi.png', width: 980, height: 875 }
+
+export const TROPHY_ICONS = {
+    gold: { src: '/assets/gold-trophy-icon.png', width: 320, height: 270 },
+    silver: { src: '/assets/silver-trophy-icon.png', width: 320, height: 270 },
+    bronze: { src: '/assets/bronze-trophy-icon.png', width: 320, height: 270 },
+} as const
+
+export const MEDAL_ICONS = {
+    gold: { src: '/assets/gold-medal-icon.png', width: 210, height: 265 },
+    silver: { src: '/assets/silver-medal-icon.png', width: 210, height: 265 },
+    bronze: { src: '/assets/bronze-medal-icon.png', width: 210, height: 265 },
+} as const
+
+export const STAR_BADGE = { src: '/assets/star-badge.png', width: 235, height: 220 }
+
+// Helper: ambil medal berdasarkan rank
+export function getMedalIcon(rank: number) {
+    if (rank === 1) return MEDAL_ICONS.gold
+    if (rank === 2) return MEDAL_ICONS.silver
+    if (rank === 3) return MEDAL_ICONS.bronze
+    return null  // rank 4+ tidak ada medal
+}
+
+export function getTrophyIcon(rank: number) {
+    if (rank === 1) return TROPHY_ICONS.gold
+    if (rank === 2) return TROPHY_ICONS.silver
+    if (rank === 3) return TROPHY_ICONS.bronze
+    return null
+}
+
+// ── Game Over ─────────────────────────────────────────────
+export const GAME_OVER_ILLUSTRATION = { src: '/assets/game-over-ilustration.png', width: 1290, height: 775 }
+
+// ── Ruang Belajar ─────────────────────────────────────────
+export const RUANG_BELAJAR_HERO = { src: '/assets/ruang-belajar-hero.png', width: 910, height: 715 }
+
+export const TOPIC_ICONS = {
+    budgeting: { src: '/assets/budgeting-topic.png', width: 405, height: 420 },
+    pinjol: { src: '/assets/pinjol-topic.png', width: 405, height: 420 },
+    investasi: { src: '/assets/investasi-topic.png', width: 405, height: 420 },
+} as const
+
+// Helper: mapping level ke topic icons yang relevan
+export function getTopicIconsForLevel(level: import('@/types/game').GameLevel) {
+    switch (level) {
+        case 'easy': return [TOPIC_ICONS.budgeting]
+        case 'medium': return [TOPIC_ICONS.budgeting, TOPIC_ICONS.pinjol]
+        case 'hard': return [TOPIC_ICONS.pinjol, TOPIC_ICONS.investasi]
+    }
+}
+
+// ── Share Cards ───────────────────────────────────────────
+export const SHARE_CARDS: Record<import('@/types/game').GameLevel, { src: string; width: number; height: number }> = {
+    easy: { src: '/assets/share-easy.png', width: 1024, height: 1536 },
+    medium: { src: '/assets/share-medium.png', width: 1024, height: 1536 },
+    hard: { src: '/assets/share-hard.png', width: 1024, height: 1536 },
+}
+
+// ── Tutorial ──────────────────────────────────────────────
+export const TUTORIAL_ILLUSTRATION = { src: '/assets/tutorial-ilustration.png', width: 1350, height: 410 }

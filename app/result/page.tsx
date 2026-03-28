@@ -11,7 +11,7 @@ import LeaderboardTable, {
 } from "@/components/ui/LeaderboardTable";
 import AppLogo from "@/components/ui/AppLogo";
 import Image from "next/image";
-import { NEW_RECORD_BANNER, PERFECT_CLEAR_BANNER } from "@/lib/assets";
+import { NEW_RECORD_BANNER, PERFECT_CLEAR_BANNER, VICTORY_ILLUSTRATION } from "@/lib/assets";
 
 type RecordResponse = {
     isNewRecord: boolean;
@@ -256,6 +256,19 @@ export default function ResultPage() {
                             />
                         </div>
                     )}
+
+                    {/* VICTORY ILLUSTRATION */}
+                    <div className="w-full max-w-xl rounded-2xl overflow-hidden mb-6 mt-2 relative z-10">
+                        <Image
+                            src={VICTORY_ILLUSTRATION.src}
+                            alt="Selamat! Kamu berhasil menyelesaikan ArthaLoka!"
+                            width={VICTORY_ILLUSTRATION.width}
+                            height={VICTORY_ILLUSTRATION.height}
+                            className="w-full h-auto object-cover"
+                            style={{ width: '100%', height: 'auto' }}
+                            priority
+                        />
+                    </div>
 
                     {/* Confetti */}
                     {record?.isNewRecord && (
