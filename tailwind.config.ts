@@ -22,6 +22,21 @@ const config: Config = {
         accent: "#fbbf24",
         mascot: "#f97316",
       },
+      keyframes: {
+        shake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '20%, 60%': { transform: 'translateX(-8px)' },
+          '40%, 80%': { transform: 'translateX(8px)' },
+        },
+        popIn: {
+          '0%': { opacity: '0', transform: 'scale(0.7)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+      },
+      animation: {
+        shake: 'shake 0.4s ease-in-out',
+        popIn: 'popIn 0.3s cubic-bezier(0.34,1.56,0.64,1)',
+      },
     },
   },
   plugins: [],

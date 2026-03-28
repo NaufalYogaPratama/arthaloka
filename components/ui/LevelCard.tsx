@@ -2,7 +2,12 @@
 
 import { motion } from "framer-motion";
 
+import Image from "next/image";
+import { getCharacterFull } from "@/lib/assets";
+import type { GameLevel } from "@/types/game";
+
 interface LevelCardProps {
+    levelKey: GameLevel;
     emoji: string;
     title: string;
     topics: string;
@@ -42,6 +47,7 @@ const colorMap = {
 };
 
 export default function LevelCard({
+    levelKey,
     emoji,
     title,
     topics,
@@ -50,6 +56,9 @@ export default function LevelCard({
     onClick,
 }: LevelCardProps) {
     const c = colorMap[color];
+    const charAsset = getCharacterFull(levelKey);
+    const displayH = 140;
+    const displayW = Math.round(displayH * (charAsset.width / charAsset.height));
 
     return (
         <motion.div
@@ -57,13 +66,15 @@ export default function LevelCard({
             whileTap={{ scale: 0.98 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             onClick={onClick}
-            className={`cursor-pointer rounded-3xl p-6 border-2 ${c.bg} ${c.border} ${c.hoverBorder} shadow-md hover:shadow-xl transition-shadow duration-300`}
+            className={`cursor-pointer rounded-3xl p-6 border-2 ${c.bg} ${c.border} ${c.hoverBorder} shadow-md hover:shadow-xl transition-shadow duration-300 relative overflow-hidden`}
         >
-            {/* Emoji */}
-            <div
-                className={`w-16 h-16 rounded-2xl ${c.emoji_bg} flex items-center justify-center text-3xl mb-4 mx-auto`}
-            >
-                {emoji}
+            <div className="flex justify-between items-start mb-4">
+                {/* Emoji */}
+                <div
+                    className={`w-14 h-14 rounded-2xl ${c.emoji_bg} flex items-center justify-center text-2xl`}
+                >
+                    {emoji}
+                </div>
             </div>
 
             {/* Title */}
@@ -86,6 +97,17 @@ export default function LevelCard({
             <p className="text-sm text-gray-500 text-center leading-relaxed mb-5">
                 {description}
             </p>
+
+            <div className="flex justify-center mb-6">
+                <Image
+                    src={charAsset.src}
+                    alt={`Karakter level ${levelKey}`}
+                    width={displayW}
+                    height={displayH}
+                    className="object-contain drop-shadow-md"
+                    style={{ width: displayW, height: displayH }}
+                />
+            </div>
 
             {/* Play button */}
             <div

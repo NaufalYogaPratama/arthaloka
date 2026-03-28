@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'ArthaLoka',
     description: 'Belajar Keuangan, Main Engklek!',
-    images: [{ url: '/assets/logo-horizontal.png', width: 1200, height: 440 }],
+    images: [{ url: '/assets/logo.png', width: 1200, height: 440 }],
   },
 };
 

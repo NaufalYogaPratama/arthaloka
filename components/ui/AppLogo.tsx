@@ -23,7 +23,7 @@ export default function AppLogo({
         const dim = sizes[size];
         return (
             <Image
-                src="/assets/logo-horizontal.png"
+                src="/assets/logo.png"
                 alt="ArthaLoka Logo"
                 width={dim.width}
                 height={dim.height}
@@ -44,7 +44,7 @@ export default function AppLogo({
 
     return (
         <Image
-            src="/assets/favicon.png"
+            src="/assets/mascot.png"
             alt="ArthaLoka Icon"
             width={dim.width}
             height={dim.height}

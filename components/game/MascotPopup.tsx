@@ -1,113 +1,96 @@
-"use client";
+'use client'
 
-import { motion } from "framer-motion";
+import { MascotImage } from '@/components/ui/MascotImage'
+import type { MascotVariant } from '@/types/game'
 
-interface MascotPopupProps {
-    livesRemaining: number; // 0, 1, or 2
-    onContinue: () => void;
-    onRestart?: () => void;
+const MESSAGES: Record<string, string[]> = {
+    wrong1: [
+        'Ayo, kamu pasti bisa! Pikirkan lagi ya! 💪',
+        'Hampir benar kok! Tetap semangat! 🌟',
+        'Jangan menyerah! Masih ada harapan! 😊',
+    ],
+    wrong2: [
+        'Hati-hati! Nyawa tinggal 1! ⚠️',
+        'Satu nyawa lagi! Pikirkan baik-baik! 🙏',
+        'Kita bisa! Jangan sampai salah lagi! 💚',
+    ],
+    gameover: [
+        "It's okay, you did your best!",
+        'Ayo kita belajar bersama ya!',
+        'We are one step ahead than ever!',
+    ],
 }
 
-const messages: Record<number, { text: string; subtext: string }> = {
-    2: {
-        text: "Ayo, kamu pasti bisa! Pikirkan lagi ya! 💪",
-        subtext: "Jangan menyerah, masih ada kesempatan!",
-    },
-    1: {
-        text: "Hati-hati! Nyawa tinggal 1! ⚠️ Pikirkan baik-baik!",
-        subtext: "Satu kesalahan lagi dan permainan berakhir...",
-    },
-    0: {
-        text: "It's okay, you did your best! 🦧",
-        subtext: "Gagal itu guru terbaik. Ayo coba lagi!",
-    },
-};
+// Map popup type ke MascotVariant
+const VARIANT_MAP: Record<string, MascotVariant> = {
+    wrong1: 'wrong1',
+    wrong2: 'wrong2',
+    gameover: 'sedih',
+    correct: 'senang',
+}
 
-export default function MascotPopup({
-    livesRemaining,
-    onContinue,
-    onRestart,
-}: MascotPopupProps) {
-    const msg = messages[livesRemaining] || messages[2];
-    const isGameOver = livesRemaining === 0;
+export interface MascotPopupProps {
+    type: 'wrong1' | 'wrong2' | 'gameover' | 'correct'
+    onClose?: () => void
+    message?: string  // override message jika perlu
+}
+
+export function MascotPopup({ type, onClose, message }: MascotPopupProps) {
+    const variant = VARIANT_MAP[type]
+    const msgs = MESSAGES[type] ?? []
+    const displayMessage = message ?? msgs[Math.floor(Math.random() * msgs.length)]
+    const isGameOver = type === 'gameover'
+
+    const bgColors = {
+        wrong1: 'bg-green-50  border-green-200',
+        wrong2: 'bg-amber-50  border-amber-200',
+        gameover: 'bg-red-50    border-red-200',
+        correct: 'bg-green-50  border-green-200',
+    }
 
     return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[95] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-        >
-            <motion.div
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.5, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 18 }}
-                className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 text-center"
-            >
-                {/* Mascot emoji with bounce */}
-                <motion.div
-                    animate={{
-                        y: [0, -15, 0, -8, 0],
-                    }}
-                    transition={{
-                        duration: 1.2,
-                        repeat: Infinity,
-                        repeatDelay: 1.5,
-                    }}
-                    className="text-7xl mb-4"
-                >
-                    🦧
-                </motion.div>
+        // Backdrop
+        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/50 p-4">
+            <div className={`relative bg-white rounded-3xl p-8 max-w-sm w-full text-center
+                       shadow-2xl border-2 ${bgColors[type]}
+                       animate-[popIn_0.3s_cubic-bezier(0.34,1.56,0.64,1)]`}>
 
-                {/* Lives indicator */}
-                <div className="flex justify-center gap-1 mb-3">
-                    {[0, 1, 2].map((i) => (
-                        <span
-                            key={i}
-                            className={`text-xl transition-all duration-300 ${i < livesRemaining
-                                    ? "opacity-100"
-                                    : "opacity-30 grayscale"
-                                }`}
-                        >
-                            ❤️
-                        </span>
-                    ))}
+                {/* Mascot Image */}
+                <div className="flex justify-center mb-4">
+                    <MascotImage
+                        variant={variant}
+                        displayHeight={180}
+                        priority
+                    />
                 </div>
 
                 {/* Message */}
-                <h3 className="font-fredoka text-lg font-bold text-gray-800 mb-2">
-                    {msg.text}
-                </h3>
-                <p className="text-sm text-gray-500 mb-6">{msg.subtext}</p>
+                <p className="text-lg font-bold text-gray-800 leading-relaxed mb-2">
+                    {displayMessage}
+                </p>
 
-                {/* Action buttons */}
-                {isGameOver ? (
-                    <div className="flex flex-col gap-3">
-                        <button
-                            onClick={onRestart}
-                            className="w-full py-3 rounded-2xl bg-gradient-to-r from-orange-400 to-red-500 text-white font-bold shadow-lg shadow-orange-500/25 hover:shadow-xl transition-all active:scale-[0.98]"
-                        >
-                            🔄 Coba Lagi!
-                        </button>
-                        <button
-                            onClick={() =>
-                                (window.location.href = "/")
-                            }
-                            className="w-full py-3 rounded-2xl bg-white border-2 border-gray-200 text-gray-600 font-bold hover:border-orange-400 transition-all active:scale-[0.98]"
-                        >
-                            Menu Utama
-                        </button>
-                    </div>
-                ) : (
+                {/* Sub-message per type */}
+                {type === 'wrong1' && (
+                    <p className="text-sm text-gray-500 mb-6">Nyawa berkurang 1. Masih semangat!</p>
+                )}
+                {type === 'wrong2' && (
+                    <p className="text-sm text-red-500 font-semibold mb-6">⚠️ Nyawa tinggal 1!</p>
+                )}
+
+                {/* CTA Button — hanya untuk wrong1 & wrong2 */}
+                {!isGameOver && onClose && (
                     <button
-                        onClick={onContinue}
-                        className="w-full py-3 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold shadow-lg shadow-green-500/25 hover:shadow-xl transition-all active:scale-[0.98]"
+                        onClick={onClose}
+                        className="bg-green-500 hover:bg-green-600 active:scale-95
+                       text-white font-extrabold text-base py-3 px-10
+                       rounded-2xl transition-all duration-150"
                     >
                         Lanjut →
                     </button>
                 )}
-            </motion.div>
-        </motion.div>
-    );
+            </div>
+        </div>
+    )
 }
+
+export default MascotPopup;

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { calculateScore, getMultiplier } from "@/lib/scoring";
+import type { CharacterExpression, StoneState, ArrowDirection, ArrowStyle } from "@/types/game";
 
 export interface QuizQuestion {
     id: string;
@@ -36,6 +37,11 @@ export interface GameState {
     // Board state
     stonePosition: number | null; // 1–7
     characterPosition: string; // 'start' | '1'–'7'
+    characterExpression: CharacterExpression;
+    stoneState: StoneState;
+    arrowDirection: ArrowDirection | null;
+    arrowStyle: ArrowStyle;
+    showArrow: boolean;
 
     // Scoring
     score: number;
@@ -61,6 +67,10 @@ export interface GameState {
     setPlayerInfo: (name: string, isGuest: boolean) => void;
     setPhase: (phase: GamePhase) => void;
     setCharacterPosition: (position: string) => void;
+    setCharacterExpression: (expr: CharacterExpression) => void;
+    setStoneState: (state: StoneState) => void;
+    showPathArrow: (direction: ArrowDirection, style: ArrowStyle) => void;
+    hideArrow: () => void;
     setQuestions: (questions: QuizQuestion[]) => void;
     throwStone: () => void;
     answerQuestion: (
@@ -167,6 +177,11 @@ export const useGameStore = create<GameState>((set, get) => ({
     // Board defaults
     stonePosition: null,
     characterPosition: "start",
+    characterExpression: "idle",
+    stoneState: "normal",
+    arrowDirection: null,
+    arrowStyle: "dashed",
+    showArrow: false,
 
     // Scoring defaults
     score: 0,
@@ -194,6 +209,14 @@ export const useGameStore = create<GameState>((set, get) => ({
     setPhase: (phase) => set({ phase }),
 
     setCharacterPosition: (position) => set({ characterPosition: position }),
+
+    setCharacterExpression: (expr) => set({ characterExpression: expr }),
+
+    setStoneState: (state) => set({ stoneState: state }),
+
+    showPathArrow: (direction, style) => set({ arrowDirection: direction, arrowStyle: style, showArrow: true }),
+
+    hideArrow: () => set({ showArrow: false, arrowDirection: null }),
 
     setQuestions: (questions) => set({ questions }),
 
@@ -339,5 +362,10 @@ export const useGameStore = create<GameState>((set, get) => ({
             mascotLives: 3,
             lastScoreGain: null,
             wobbleKey: 0,
+            characterExpression: "idle",
+            stoneState: "normal",
+            arrowDirection: null,
+            arrowStyle: "dashed",
+            showArrow: false,
         }),
 }));

@@ -46,6 +46,8 @@ export default function GamePage() {
     const answerQuestion = useGameStore((s) => s.answerQuestion);
     const fetchQuestions = useGameStore((s) => s.fetchQuestions);
     const dismissMascot = useGameStore((s) => s.dismissMascot);
+    const setCharacterExpression = useGameStore((s) => s.setCharacterExpression);
+    const setStoneState = useGameStore((s) => s.setStoneState);
 
     const wobbleControls = useAnimation();
 
@@ -139,6 +141,28 @@ export default function GamePage() {
 
     // ── Phase state machine auto-play loop ──
     useEffect(() => {
+        // Handle character expression based on phase
+        if (phase === "countdown" || phase === "idle") {
+            setCharacterExpression("idle");
+        } else if (
+            phase === "jumping_fwd" ||
+            phase === "jumping_continue" ||
+            phase === "jumping_back" ||
+            phase === "at_head" ||
+            phase === "pickup"
+        ) {
+            setCharacterExpression("action");
+        } else if (phase === "game_over") {
+            setCharacterExpression(level === "easy" ? "wrong" : "over");
+        }
+
+        // Handle stone state
+        if (phase === "throwing") {
+            setStoneState("highlight");
+        } else {
+            setStoneState("normal");
+        }
+
         const phaseKey = `${phase}-${roundNum}-${stonePosition}`;
         if (phaseHandledRef.current === phaseKey) return;
         phaseHandledRef.current = phaseKey;
@@ -363,9 +387,27 @@ export default function GamePage() {
     // ── Quiz answer handler ──
     const handleQuizAnswer = useCallback(
         async (selectedIndex: number) => {
-            return await answerQuestion(selectedIndex);
+            const res = await answerQuestion(selectedIndex);
+            if (res.correct) {
+                setCharacterExpression("correct");
+                setTimeout(() => {
+                    const currentPhase = useGameStore.getState().phase;
+                    if (currentPhase !== "game_over") {
+                        setCharacterExpression("idle");
+                    }
+                }, 3000);
+            } else {
+                setCharacterExpression("wrong");
+                setTimeout(() => {
+                    const currentPhase = useGameStore.getState().phase;
+                    if (currentPhase !== "game_over") {
+                        setCharacterExpression("idle");
+                    }
+                }, 1500);
+            }
+            return res;
         },
-        [answerQuestion]
+        [answerQuestion, setCharacterExpression]
     );
 
     // ── Quiz complete (auto-close modal and advance) ──
@@ -515,7 +557,6 @@ export default function GamePage() {
                         animate={wobbleControls}
                     >
                         <EngklekBoard
-                            level={level}
                             onStoneAnimationComplete={
                                 handleStoneAnimationComplete
                             }
@@ -546,9 +587,14 @@ export default function GamePage() {
             <AnimatePresence>
                 {showMascot && (
                     <MascotPopup
-                        livesRemaining={mascotLives}
-                        onContinue={handleMascotContinue}
-                        onRestart={handleRestart}
+                        type={
+                            mascotLives === 2
+                                ? "wrong1"
+                                : mascotLives === 1
+                                    ? "wrong2"
+                                    : "gameover"
+                        }
+                        onClose={mascotLives > 0 ? handleMascotContinue : handleRestart}
                     />
                 )}
             </AnimatePresence>

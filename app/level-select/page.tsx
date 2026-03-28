@@ -91,6 +91,7 @@ export default function LevelSelectPage() {
                     {levels.map((level) => (
                         <motion.div key={level.key} variants={itemVariants}>
                             <LevelCard
+                                levelKey={level.key}
                                 emoji={level.emoji}
                                 title={level.title}
                                 topics={level.topics}
