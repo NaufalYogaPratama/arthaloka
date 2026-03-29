@@ -1,133 +1,161 @@
 'use client'
 
 import Image from 'next/image'
-import { LEVEL_ARTWORK, LEVEL_ICON } from '@/lib/assets'
-import { getCharacterFull } from '@/lib/assets'
+import { LEVEL_ARTWORK, LEVEL_ICON, getCharacterFull } from '@/lib/assets'
 import type { GameLevel } from '@/types/game'
 
 const LEVEL_CONFIG: Record<GameLevel, {
     label: string
     tagline: string
     topics: string[]
-    colorClass: string
-    borderClass: string
-    bgClass: string
-    badgeClass: string
+    color: string
+    bgGradient: string
+    borderColor: string
+    badgeBg: string
+    badgeColor: string
 }> = {
     easy: {
         label: 'Easy',
         tagline: 'Mulai perjalanan finansialmu!',
-        topics: ['💰 Budgeting', '🏦 Menabung', '💳 Kebutuhan vs Keinginan'],
-        colorClass: 'text-green-700',
-        borderClass: 'border-green-200 hover:border-green-400',
-        bgClass: 'bg-gradient-to-br from-green-50 to-emerald-50',
-        badgeClass: 'bg-green-100 text-green-800',
+        topics: ['💰 Budgeting', '🏦 Menabung', '💳 Needs vs Wants'],
+        color: '#15803d',
+        bgGradient: 'linear-gradient(135deg, #f0fdf4, #dcfce7)',
+        borderColor: '#86efac',
+        badgeBg: '#dcfce7',
+        badgeColor: '#15803d',
     },
     medium: {
         label: 'Medium',
-        tagline: 'Hadapi tantangan keuangan!',
-        topics: ['😰 Impulsive Buying', '💳 Pay Later', '📊 Hutang'],
-        colorClass: 'text-blue-700',
-        borderClass: 'border-blue-200 hover:border-blue-400',
-        bgClass: 'bg-gradient-to-br from-blue-50 to-sky-50',
-        badgeClass: 'bg-blue-100 text-blue-800',
+        tagline: 'Hadapi tantangan keuangan nyata!',
+        topics: ['😰 Impulsive Buying', '💳 Pay Later', '📊 Kelola Hutang'],
+        color: '#1d4ed8',
+        bgGradient: 'linear-gradient(135deg, #eff6ff, #dbeafe)',
+        borderColor: '#93c5fd',
+        badgeBg: '#dbeafe',
+        badgeColor: '#1d4ed8',
     },
     hard: {
         label: 'Hard',
-        tagline: 'Kuasai investasi & risiko!',
+        tagline: 'Kuasai investasi & risiko finansial!',
         topics: ['⚠️ Pinjol Ilegal', '📈 Investasi', '🔢 Bunga Berbunga'],
-        colorClass: 'text-red-700',
-        borderClass: 'border-red-200 hover:border-red-400',
-        bgClass: 'bg-gradient-to-br from-red-50 to-orange-50',
-        badgeClass: 'bg-red-100 text-red-800',
+        color: '#991b1b',
+        bgGradient: 'linear-gradient(135deg, #fef2f2, #fee2e2)',
+        borderColor: '#fca5a5',
+        badgeBg: '#fee2e2',
+        badgeColor: '#991b1b',
     },
 }
 
 interface LevelCardProps {
-    levelKey: GameLevel
-    emoji?: string // unused now, for compatibility with old props if any
-    title?: string
-    topics?: string
-    description?: string
-    color?: string
-    onClick: () => void
+    level: GameLevel
+    onSelect: (level: GameLevel) => void
 }
 
-export default function LevelCard({ levelKey, onClick }: LevelCardProps) {
-    const cfg = LEVEL_CONFIG[levelKey]
-    const artwork = LEVEL_ARTWORK[levelKey]
-    const icon = LEVEL_ICON[levelKey]
-    const char = getCharacterFull(levelKey)
+export default function LevelCard({ level, onSelect }: LevelCardProps) {
+    const cfg = LEVEL_CONFIG[level]
+    const artwork = LEVEL_ARTWORK[level]
+    const icon = LEVEL_ICON[level]
+    const char = getCharacterFull(level)
 
-    // Displayed sizes — maintain aspect ratio
-    // Artwork: display height 120px
-    const artworkH = 120
-    const artworkW = Math.round(artworkH * (artwork.width / artwork.height))
+    // Artwork: height fixed 100px, width auto (maintain ratio)
+    const artH = 100
+    const artW = artwork ? Math.round(artH * (artwork.width / artwork.height)) : 0
 
-    // Char preview: height 100px
-    const charH = 100
-    const charW = Math.round(charH * (char.width / char.height))
+    // Icon: 32×32 display (dibulatkan dari ratio ~1:1)
+    const iconDisplaySize = 32
+
+    // Character: height 110px
+    const charH = 110
+    const charW = char ? Math.round(charH * (char.width / char.height)) : 0
 
     return (
         <button
-            onClick={onClick}
-            className={`w-full text-left rounded-2xl p-5 border-2 ${cfg.borderClass} ${cfg.bgClass}
-                  shadow-sm hover:shadow-md active:scale-[0.98]
-                  transition-all duration-200 flex items-center gap-4`}
+            onClick={() => onSelect(level)}
+            className="w-full text-left rounded-2xl border-2 overflow-hidden
+                 hover:scale-[1.015] active:scale-[0.985]
+                 transition-all duration-200 shadow-sm hover:shadow-md"
+            style={{
+                borderColor: cfg.borderColor,
+                background: cfg.bgGradient,
+            }}
         >
-            {/* Left: Artwork illustration */}
-            <div className="flex-shrink-0 w-[110px] sm:w-[130px] rounded-xl overflow-hidden bg-white/50 flex justify-center items-center">
-                <Image
-                    src={artwork.src}
-                    alt={`Level ${cfg.label} artwork`}
-                    width={artworkW}
-                    height={artworkH}
-                    className="object-contain max-h-[120px]"
-                    style={{ width: 'auto', height: '100%' }}
-                />
+            {/* TOP: artwork kiri + karakter kanan — di dalam area terbatas */}
+            <div className="flex items-end justify-between px-5 pt-4 pb-0 gap-2">
+
+                {/* Artwork illustration — kiri */}
+                <div className="flex-shrink-0 rounded-xl overflow-hidden">
+                    <Image
+                        src={artwork.src}
+                        alt={`Ilustrasi ${cfg.label}`}
+                        width={artW}
+                        height={artH}
+                        className="object-contain"
+                        style={{ width: artW, height: artH }}
+                    />
+                </div>
+
+                {/* Character preview — kanan, sedikit lebih besar */}
+                <div className="flex-shrink-0">
+                    <Image
+                        src={char.src}
+                        alt={`Karakter ${cfg.label}`}
+                        width={charW}
+                        height={charH}
+                        className="object-contain"
+                        style={{ width: charW, height: charH }}
+                    />
+                </div>
             </div>
 
-            {/* Center: Info */}
-            <div className="flex-1 min-w-0">
-                {/* Header: Icon + Label */}
+            {/* BOTTOM: Info teks */}
+            <div className="px-5 pt-2 pb-4">
+
+                {/* Icon + Label level */}
                 <div className="flex items-center gap-2 mb-1">
                     <Image
                         src={icon.src}
                         alt={`Icon ${cfg.label}`}
-                        width={28}
-                        height={28}
+                        width={iconDisplaySize}
+                        height={iconDisplaySize}
                         className="object-contain rounded-full"
-                        style={{ width: 28, height: 28 }}
+                        style={{ width: iconDisplaySize, height: iconDisplaySize }}
                     />
-                    <span className={`text-xl font-black ${cfg.colorClass}`}>{cfg.label}</span>
+                    <span
+                        className="text-xl font-black"
+                        style={{ color: cfg.color }}
+                    >
+                        {cfg.label}
+                    </span>
                 </div>
 
-                <p className="text-gray-500 text-xs mb-3">{cfg.tagline}</p>
+                {/* Tagline */}
+                <p className="text-gray-600 text-sm font-semibold mb-2.5">
+                    {cfg.tagline}
+                </p>
 
-                {/* Topics */}
-                <div className="flex flex-wrap gap-1">
+                {/* Topic badges */}
+                <div className="flex flex-wrap gap-1.5">
                     {cfg.topics.map(t => (
-                        <span key={t} className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${cfg.badgeClass}`}>
+                        <span
+                            key={t}
+                            className="text-[11px] font-bold px-2.5 py-1 rounded-full"
+                            style={{ background: cfg.badgeBg, color: cfg.badgeColor }}
+                        >
                             {t}
                         </span>
                     ))}
                 </div>
-            </div>
 
-            {/* Right: Character preview */}
-            <div className="flex-shrink-0 hidden sm:block">
-                <Image
-                    src={char.src}
-                    alt={`Karakter ${levelKey}`}
-                    width={charW}
-                    height={charH}
-                    className="object-contain"
-                    style={{ width: charW, height: charH }}
-                />
+                {/* Arrow CTA */}
+                <div className="flex justify-end mt-2.5">
+                    <span
+                        className="text-sm font-extrabold"
+                        style={{ color: cfg.color }}
+                    >
+                        Pilih Level →
+                    </span>
+                </div>
             </div>
-
-            {/* Arrow */}
-            <span className={`text-2xl ${cfg.colorClass} flex-shrink-0`}>→</span>
         </button>
     )
 }

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import LevelCard from "@/components/ui/LevelCard";
 import { useGameStore } from "@/store/gameStore";
+import type { GameLevel } from "@/types/game";
 
 const levels = [
     {
@@ -81,23 +82,18 @@ export default function LevelSelectPage() {
                     </p>
                 </motion.div>
 
-                {/* Level cards grid */}
+                {/* Level cards stack */}
                 <motion.div
                     variants={containerVariants}
                     initial="hidden"
                     animate="show"
-                    className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                    className="flex flex-col gap-5 w-full max-w-lg mx-auto px-4"
                 >
-                    {levels.map((level) => (
-                        <motion.div key={level.key} variants={itemVariants}>
+                    {(['easy', 'medium', 'hard'] as GameLevel[]).map(level => (
+                        <motion.div key={level} variants={itemVariants}>
                             <LevelCard
-                                levelKey={level.key}
-                                emoji={level.emoji}
-                                title={level.title}
-                                topics={level.topics}
-                                description={level.description}
-                                color={level.color}
-                                onClick={() => handleSelectLevel(level.key)}
+                                level={level}
+                                onSelect={handleSelectLevel}
                             />
                         </motion.div>
                     ))}

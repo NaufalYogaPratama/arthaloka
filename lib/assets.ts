@@ -36,9 +36,9 @@ const CHARACTER_FULL_FILES: Record<GameLevel, string> = {
 }
 
 const CHARACTER_FULL_DIMENSIONS: Record<GameLevel, { width: number; height: number }> = {
-    easy: { width: 540, height: 975 },
-    medium: { width: 585, height: 1005 },
-    hard: { width: 605, height: 1035 },
+    easy: { width: 840, height: 975 },
+    medium: { width: 885, height: 1005 },
+    hard: { width: 905, height: 1035 },
 }
 
 // Expression per level
@@ -138,7 +138,7 @@ export const LEVEL_ARTWORK: Record<GameLevel, { src: string; width: number; heig
 // icon-normal.png = level Medium (nama file berbeda dari konvensi)
 export const LEVEL_ICON: Record<GameLevel, { src: string; width: number; height: number }> = {
     easy: { src: '/assets/icon-easy.png', width: 415, height: 425 },
-    medium: { src: '/assets/icon-normal.png', width: 415, height: 425 },
+    medium: { src: '/assets/icon-medium.png', width: 415, height: 425 },
     hard: { src: '/assets/icon-hard.png', width: 415, height: 425 },
 }
 

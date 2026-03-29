@@ -15,9 +15,9 @@ const PETAK_POSITIONS: Record<string | number, { topPct: number; leftPct: number
     2: { topPct: 58, leftPct: 25 },
     3: { topPct: 58, leftPct: 75 },
     4: { topPct: 44, leftPct: 50 },
-    5: { topPct: 28, leftPct: 25 },
-    6: { topPct: 28, leftPct: 75 },
-    7: { topPct: 12, leftPct: 50 },
+    5: { topPct: 33, leftPct: 25 },
+    6: { topPct: 33, leftPct: 75 },
+    7: { topPct: 16, leftPct: 50 },  // naik dari 12% → 16%
 }
 
 interface EngklekBoardProps {
@@ -100,7 +100,13 @@ export default function EngklekBoard({
     const stonePosStyle = stonePosition ? getPositionStyle(stonePosition) : null
 
     return (
-        <div className="relative w-full max-w-[360px] mx-auto drop-shadow-lg">
+        <div
+            className="relative w-full max-w-[360px] mx-auto"
+            style={{
+                paddingTop: '80px',   // ruang untuk kepala karakter di petak 7
+                overflow: 'visible',  // WAJIB: karakter boleh overflow ke atas
+            }}
+        >
             {/* Background Board */}
             <Image
                 src={BOARD_ASSET.src}
@@ -112,7 +118,7 @@ export default function EngklekBoard({
             />
 
             {/* Frame overlay */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute inset-0 pointer-events-none" style={{ overflow: 'visible' }}>
 
                 {/* Stone Layer */}
                 <AnimatePresence>
@@ -173,7 +179,7 @@ export default function EngklekBoard({
                             top: charPosStyle.top,
                             left: charPosStyle.left,
                             x: '-50%',
-                            y: '-80%', // Offset so it stands *on* the point, not centered on it
+                            y: '-88%', // Anchor from bottom: character stands on the petak
                         }}
                         transition={{
                             type: 'spring',

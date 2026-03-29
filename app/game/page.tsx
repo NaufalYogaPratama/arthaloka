@@ -16,7 +16,13 @@ const CountdownOverlay = dynamic(
     () => import("@/components/game/CountdownOverlay"),
     { ssr: false }
 );
-const HUDBar = dynamic(() => import("@/components/game/HUDBar"), {
+const HUDBar = dynamic<{
+    lives: number;
+    score: number;
+    combo: number;
+    roundNum: number;
+    questionIdx: number;
+}>(() => import("@/components/game/HUDBar"), {
     ssr: false,
 });
 const QuizModal = dynamic(() => import("@/components/game/QuizModal"), {
@@ -26,6 +32,7 @@ const MascotPopup = dynamic(() => import("@/components/game/MascotPopup"), {
     ssr: false,
 });
 import { ScorePopup } from "@/components/game/ScorePopup";
+import { TutorialModal } from "@/components/game/TutorialModal";
 
 export default function GamePage() {
     const router = useRouter();
@@ -57,11 +64,33 @@ export default function GamePage() {
     const [statusText, setStatusText] = useState("");
     const [showQuiz, setShowQuiz] = useState(false);
     const [scorePopupKey, setScorePopupKey] = useState(0);
+    const [showTutorial, setShowTutorial] = useState(false);
     const [currentQuizType, setCurrentQuizType] = useState<"quiz1" | "quiz2">(
         "quiz1"
     );
     const phaseHandledRef = useRef<string>("");
-    const quizPendingPhaseRef = useRef<GamePhase | null>(null);
+
+    // BUG FIX #5: Use refs for sequential counters to avoid stale state
+    const roundRef = useRef(0);
+    const qIdxRef = useRef(0);
+    const pendingPhaseRef = useRef<{
+        quizNum: number;
+        stonePos: number;
+        round: number;
+    } | null>(null);
+
+    // Sync refs with store state
+    useEffect(() => {
+        roundRef.current = roundNum;
+    }, [roundNum]);
+
+    useEffect(() => {
+        qIdxRef.current = questionIdx;
+    }, [questionIdx]);
+
+    const setQIdx = (val: number) => {
+        // We'll just rely on incrementQuestionIdx() for store sync
+    };
 
     // Type import for quiz phase tracking
     type GamePhase = Parameters<typeof setPhase>[0];
@@ -141,6 +170,13 @@ export default function GamePage() {
         []
     );
 
+    useEffect(() => {
+        try {
+            const seen = localStorage.getItem("arthaloka_tutorial_seen");
+            if (!seen) setShowTutorial(true);
+        } catch { }
+    }, []);
+
     // ── Phase state machine auto-play loop ──
     useEffect(() => {
         // Handle character expression based on phase
@@ -206,7 +242,6 @@ export default function GamePage() {
                             // Show quiz
                             setCurrentQuizType("quiz1");
                             setShowQuiz(true);
-                            quizPendingPhaseRef.current = "jumping_continue";
                             setPhase("quiz1");
                         }, 500);
                     }
@@ -285,7 +320,6 @@ export default function GamePage() {
                         timer = setTimeout(() => {
                             setCurrentQuizType("quiz2");
                             setShowQuiz(true);
-                            quizPendingPhaseRef.current = "pickup";
                             setPhase("quiz2");
                         }, 500);
                     }
@@ -368,84 +402,114 @@ export default function GamePage() {
         if (currentPhase === "jumping_fwd") {
             setCurrentQuizType("quiz1");
             setShowQuiz(true);
-            quizPendingPhaseRef.current = "jumping_continue";
             setPhase("quiz1");
-            incrementQuestionIdx();
         } else if (currentPhase === "jumping_continue") {
             setPhase("at_head");
         } else if (currentPhase === "jumping_back") {
             setCurrentQuizType("quiz2");
             setShowQuiz(true);
-            quizPendingPhaseRef.current = "pickup";
             setPhase("quiz2");
-            incrementQuestionIdx();
         } else if (currentPhase === "pickup") {
             setPhase("round_done");
         }
 
         setAnimatingPath([]);
-    }, [setPhase, incrementQuestionIdx]);
+    }, [setPhase]);
 
     // ── Quiz answer handler ──
+    // ── Helper handlers for continuation ──
+    const continueAfterQuiz1 = useCallback((stone: number | null, r: number) => {
+        setPhase("jumping_continue");
+    }, [setPhase]);
+
+    const continueAfterQuiz2 = useCallback((stone: number | null, r: number) => {
+        setPhase("pickup");
+    }, [setPhase]);
+
     const handleQuizAnswer = useCallback(
         async (selectedIndex: number) => {
+            const q = questions[qIdxRef.current];
+            if (!q) return { correct: false, correctIndex: -1 };
+
+            // Capture NOW - before any state updates
+            const capturedStonePos = stonePosition;
+            const capturedRound = roundRef.current;
+            const capturedQuizNum = currentQuizType === "quiz1" ? 1 : 2;
+
             const res = await answerQuestion(selectedIndex);
-            if (res.correct) {
-                setScorePopupKey((prev) => prev + 1);
-                setCharacterExpression("correct");
-                setTimeout(() => {
-                    const currentPhase = useGameStore.getState().phase;
-                    if (currentPhase !== "game_over") {
-                        setCharacterExpression("idle");
+
+            // Wait for answer animation in QuizModal (900ms)
+            setTimeout(() => {
+                setShowQuiz(false);
+
+                // Increment question index AFTER quiz modal is dismissed
+                qIdxRef.current += 1;
+                incrementQuestionIdx(); // sync with store
+
+                if (res.correct) {
+                    setScorePopupKey((prev) => prev + 1);
+                    setCharacterExpression("correct");
+
+                    if (capturedQuizNum === 1) {
+                        continueAfterQuiz1(capturedStonePos, capturedRound);
+                    } else {
+                        continueAfterQuiz2(capturedStonePos, capturedRound);
                     }
-                }, 3000);
-            } else {
-                setCharacterExpression("wrong");
-                setTimeout(() => {
-                    const currentPhase = useGameStore.getState().phase;
-                    if (currentPhase !== "game_over") {
-                        setCharacterExpression("idle");
-                    }
-                }, 1500);
-            }
+
+                    setTimeout(() => {
+                        const currentPhase = useGameStore.getState().phase;
+                        if (currentPhase !== "game_over") {
+                            setCharacterExpression("idle");
+                        }
+                    }, 3000);
+                } else {
+                    setCharacterExpression("wrong");
+                    // Save context for mascot close
+                    pendingPhaseRef.current = {
+                        quizNum: capturedQuizNum,
+                        stonePos: capturedStonePos || 0,
+                        round: capturedRound,
+                    };
+
+                    setTimeout(() => {
+                        const currentPhase = useGameStore.getState().phase;
+                        if (currentPhase !== "game_over") {
+                            setCharacterExpression("idle");
+                        }
+                    }, 1500);
+                }
+            }, 900);
+
             return res;
         },
-        [answerQuestion, setCharacterExpression]
+        [
+            questions,
+            stonePosition,
+            currentQuizType,
+            answerQuestion,
+            incrementQuestionIdx,
+            setCharacterExpression,
+            continueAfterQuiz1,
+            continueAfterQuiz2,
+        ]
     );
-
-    // ── Quiz complete (auto-close modal and advance) ──
-    const handleQuizComplete = useCallback(() => {
-        setShowQuiz(false);
-        const state = useGameStore.getState();
-
-        // Don't advance if game over
-        if (state.lives <= 0 || state.phase === "game_over") return;
-
-        // If mascot is showing (wrong answer), wait for mascot dismiss
-        if (state.showMascot) return;
-
-        // Advance to next phase
-        const pendingPhase = quizPendingPhaseRef.current;
-        if (pendingPhase) {
-            setPhase(pendingPhase);
-            quizPendingPhaseRef.current = null;
-        }
-    }, [setPhase]);
 
     // ── Mascot dismiss → continue game ──
     const handleMascotContinue = useCallback(() => {
         dismissMascot();
-        const state = useGameStore.getState();
+        const pending = pendingPhaseRef.current;
+        if (!pending) return;
+        pendingPhaseRef.current = null;
 
+        const state = useGameStore.getState();
         if (state.lives <= 0) return;
 
-        // Advance to the pending phase
-        const pendingPhase = quizPendingPhaseRef.current;
-        if (pendingPhase) {
-            setPhase(pendingPhase);
-            quizPendingPhaseRef.current = null;
+        if (pending.quizNum === 1) {
+            continueAfterQuiz1(pending.stonePos, pending.round);
+        } else {
+            continueAfterQuiz2(pending.stonePos, pending.round);
         }
-    }, [dismissMascot, setPhase]);
+    }, [dismissMascot, continueAfterQuiz1, continueAfterQuiz2]);
 
     const handleRestart = useCallback(() => {
         resetGame();
@@ -501,7 +565,13 @@ export default function GamePage() {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.2, duration: 0.4 }}
                 >
-                    <HUDBar />
+                    <HUDBar
+                        lives={mascotLives}
+                        score={useGameStore.getState().score}
+                        combo={useGameStore.getState().combo}
+                        roundNum={roundNum}
+                        questionIdx={qIdxRef.current}
+                    />
                 </motion.div>
             )}
 
@@ -576,12 +646,12 @@ export default function GamePage() {
 
             {/* Quiz Modal */}
             <AnimatePresence>
-                {showQuiz && currentQuestion && (
+                {showQuiz && qIdxRef.current < questions.length && questions[qIdxRef.current] && (
                     <QuizModal
-                        question={currentQuestion}
+                        question={questions[qIdxRef.current]}
                         quizType={currentQuizType}
                         onAnswer={handleQuizAnswer}
-                        onComplete={handleQuizComplete}
+                        onComplete={() => { }} // Now handled inside handleQuizAnswer
                     />
                 )}
             </AnimatePresence>
@@ -600,6 +670,10 @@ export default function GamePage() {
                     />
                 )}
             </AnimatePresence>
+
+            {showTutorial && (
+                <TutorialModal onClose={() => setShowTutorial(false)} />
+            )}
         </main>
     );
 }
