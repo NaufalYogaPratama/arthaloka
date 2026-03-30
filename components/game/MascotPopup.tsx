@@ -73,8 +73,10 @@ export function MascotPopup({ type, onClose, message }: MascotPopupProps) {
                     />
 
                     <div className="flex items-center gap-4 px-5 py-4">
-                        {/* Mascot kecil */}
-                        <MascotImage variant={variant} displayHeight={72} priority />
+                        {/* Mascot — lebih besar dengan animasi extra */}
+                        <div className={`flex-shrink-0 ${type === 'wrong2' ? 'animate-bounce' : 'animate-[shake_0.4s_ease-in-out]'}`}>
+                            <MascotImage variant={variant} displayHeight={85} priority />
+                        </div>
 
                         {/* Pesan + sub-pesan */}
                         <div className="flex-1 min-w-0">

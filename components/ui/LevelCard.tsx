@@ -93,20 +93,34 @@ export default function LevelCard({ level, onSelect }: LevelCardProps) {
     const charH = 110
     const charW = char ? Math.round(charH * (char.width / char.height)) : 0
 
+    const difficultyBar = { easy: 1, medium: 2, hard: 3 }[level]
+
     return (
         <button
             onClick={() => onSelect(level)}
             className="w-full text-left rounded-2xl border-2 overflow-hidden
                  hover:scale-[1.015] active:scale-[0.985]
-                 transition-all duration-200 shadow-sm hover:shadow-md"
+                 transition-all duration-200 shadow-sm hover:shadow-lg relative"
             style={{
                 borderColor: cfg.borderColor,
                 background: cfg.bgGradient,
             }}
         >
-            {/* TOP: artwork kiri + karakter kanan */}
-            <div className="flex items-end justify-between px-5 pt-4 pb-0 gap-2">
-                <div className="flex-shrink-0 rounded-xl overflow-hidden">
+            {/* Background pattern per level — sangat subtle */}
+            <div
+                className="absolute inset-0 opacity-[0.035] pointer-events-none"
+                style={{
+                    backgroundImage: `url('/assets/brand-pattern.png')`,
+                    backgroundSize: '200px',
+                    backgroundRepeat: 'repeat',
+                }}
+            />
+
+            {/* TOP: Artwork illustration kiri + Info tengah + Karakter kanan */}
+            <div className="relative flex items-end justify-between px-4 pt-4 pb-0 gap-2">
+
+                {/* Artwork — lebih besar dari sebelumnya */}
+                <div className="flex-shrink-0 rounded-2xl overflow-hidden bg-white/30 p-1">
                     <Image
                         src={artwork.src}
                         alt={`Ilustrasi ${cfg.label}`}
@@ -117,7 +131,47 @@ export default function LevelCard({ level, onSelect }: LevelCardProps) {
                     />
                 </div>
 
-                {/* Character preview — kanan, sedikit lebih besar */}
+                {/* Center: info singkat di tengah (mengisi whitespace) */}
+                <div className="hidden sm:flex flex-1 flex-col items-center gap-1.5 pb-2">
+                    {/* Difficulty bar */}
+                    <div>
+                        <p className="text-center text-[9px] font-bold uppercase tracking-wider mb-1"
+                           style={{ color: cfg.color, opacity: 0.7 }}>
+                            Tingkat Kesulitan
+                        </p>
+                        <div className="flex gap-1 justify-center">
+                            {[1, 2, 3].map(n => (
+                                <div
+                                    key={n}
+                                    className="h-1.5 w-8 rounded-full transition-all"
+                                    style={{
+                                        background: n <= difficultyBar ? cfg.color : `${cfg.color}30`,
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Soal & waktu info */}
+                    <div className="flex gap-3 mt-1">
+                        <div className="text-center">
+                            <p className="font-black text-base leading-none" style={{ color: cfg.color }}>10</p>
+                            <p className="text-[9px] font-bold text-gray-500">soal</p>
+                        </div>
+                        <div className="w-px bg-gray-200" />
+                        <div className="text-center">
+                            <p className="font-black text-base leading-none" style={{ color: cfg.color }}>~5</p>
+                            <p className="text-[9px] font-bold text-gray-500">menit</p>
+                        </div>
+                        <div className="w-px bg-gray-200" />
+                        <div className="text-center">
+                            <p className="font-black text-base leading-none" style={{ color: cfg.color }}>3</p>
+                            <p className="text-[9px] font-bold text-gray-500">nyawa</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Character preview — kanan */}
                 <div className="flex-shrink-0">
                     <Image
                         src={char.src}
@@ -130,11 +184,17 @@ export default function LevelCard({ level, onSelect }: LevelCardProps) {
                 </div>
             </div>
 
-            {/* BOTTOM: Info teks */}
-            <div className="px-5 pt-2 pb-4">
+            {/* DIVIDER */}
+            <div
+                className="mx-4 my-2 h-px"
+                style={{ background: `linear-gradient(90deg, transparent, ${cfg.borderColor}, transparent)` }}
+            />
 
-                {/* Icon + Label level */}
-                <div className="flex items-center gap-2 mb-1">
+            {/* BOTTOM: Info teks */}
+            <div className="px-4 pb-4">
+
+                {/* Icon + Label */}
+                <div className="flex items-center gap-2 mb-1.5">
                     <Image
                         src={icon.src}
                         alt={`Icon ${cfg.label}`}
@@ -143,21 +203,25 @@ export default function LevelCard({ level, onSelect }: LevelCardProps) {
                         className="object-contain rounded-full"
                         style={{ width: iconDisplaySize, height: iconDisplaySize }}
                     />
-                    <span
-                        className="text-xl font-black"
-                        style={{ color: cfg.color }}
-                    >
+                    <span className="text-xl font-black" style={{ color: cfg.color }}>
                         {cfg.label}
                     </span>
+                    {/* "Populer" badge untuk Medium */}
+                    {level === 'medium' && (
+                        <span className="text-[9px] font-black px-2 py-0.5 rounded-full"
+                              style={{ background: '#dbeafe', color: '#1d4ed8' }}>
+                            POPULER
+                        </span>
+                    )}
                 </div>
 
                 {/* Tagline */}
-                <p className="text-gray-600 text-sm font-semibold mb-2.5 pl-1">
+                <p className="text-gray-600 text-sm font-semibold mb-2.5">
                     {cfg.tagline}
                 </p>
 
                 {/* Topic badges */}
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1.5 mb-2.5">
                     {cfg.topics.map(t => (
                         <span
                             key={t}
@@ -169,14 +233,14 @@ export default function LevelCard({ level, onSelect }: LevelCardProps) {
                     ))}
                 </div>
 
-                {/* Arrow CTA */}
-                <div className="flex justify-end mt-2.5">
-                    <span
-                        className="text-sm font-extrabold flex items-center gap-1"
-                        style={{ color: cfg.color }}
-                    >
-                        Pilih Level <ChevronRight className="w-4 h-4" />
-                    </span>
+                {/* CTA Button */}
+                <div
+                    className="w-full rounded-xl py-2.5 flex items-center justify-center gap-2
+                     font-black text-sm text-white"
+                    style={{ background: cfg.color }}
+                >
+                    <ChevronRight className="w-4 h-4" />
+                    Pilih Level Ini
                 </div>
             </div>
         </button>

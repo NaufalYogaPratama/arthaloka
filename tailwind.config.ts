@@ -52,6 +52,10 @@ const config: Config = {
           '0%, 100%': { backgroundPosition: '0% 50%' },
           '50%': { backgroundPosition: '100% 50%' },
         },
+        flash: {
+          '0%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
       },
       animation: {
         shake: 'shake 0.4s ease-in-out',
@@ -61,6 +65,7 @@ const config: Config = {
         'fade-overlay': 'fadeOverlay 0.2s ease',
         'confetti-fall': 'confettiFall 4s ease-in infinite',
         shimmer: 'shimmer 3s ease infinite',
+        flash: 'flash 0.4s ease',
       },
     },
   },
