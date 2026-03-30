@@ -80,6 +80,7 @@ export interface GameState {
     nextPhase: () => void;
     incrementQuestionIdx: () => void;
     dismissMascot: () => void;
+    resetForNewGame: () => void;
     resetGame: () => void;
 }
 
@@ -203,23 +204,14 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     // Actions
     setLevel: (level) => set({ level }),
-
     setPlayerInfo: (name, isGuest) => set({ playerName: name, isGuest }),
-
     setPhase: (phase) => set({ phase }),
-
     setCharacterPosition: (position) => set({ characterPosition: position }),
-
     setCharacterExpression: (expr) => set({ characterExpression: expr }),
-
     setStoneState: (state) => set({ stoneState: state }),
-
     showPathArrow: (direction, style) => set({ arrowDirection: direction, arrowStyle: style, showArrow: true }),
-
     hideArrow: () => set({ showArrow: false, arrowDirection: null }),
-
     setQuestions: (questions) => set({ questions }),
-
     throwStone: () => {
         const position = weightedRandomPetak();
         set({ stonePosition: position, phase: "throwing" });
@@ -261,7 +253,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             const { correct, educationalFact, correctIndex } = data;
 
             if (correct) {
-                // ✅ Correct answer
+                // Correct answer
                 const newCombo = state.combo + 1;
                 const points = calculateScore(newCombo);
                 const newMaxCombo = Math.max(state.maxCombo, newCombo);
@@ -277,7 +269,7 @@ export const useGameStore = create<GameState>((set, get) => ({
                 // Clear score gain display after animation
                 setTimeout(() => set({ lastScoreGain: null }), 1500);
             } else {
-                // ❌ Wrong answer
+                // Wrong answer
                 const newLives = state.lives - 1;
                 const newWobbleKey = state.wobbleKey + 1;
 
@@ -345,6 +337,32 @@ export const useGameStore = create<GameState>((set, get) => ({
         }
     },
 
+    // Reset game state TANPA menghapus collectedFacts (untuk navigasi dari /learn)
+    resetForNewGame: () =>
+        set({
+            phase: "countdown",
+            roundNum: 0,
+            questionIdx: 0,
+            stonePosition: null,
+            characterPosition: "start",
+            score: 0,
+            combo: 0,
+            maxCombo: 0,
+            lives: 3,
+            questions: [],
+            // collectedFacts TIDAK direset di sini - agar tetap tersedia di /learn
+            showMascot: false,
+            mascotLives: 3,
+            lastScoreGain: null,
+            wobbleKey: 0,
+            characterExpression: "idle",
+            stoneState: "normal",
+            arrowDirection: null,
+            arrowStyle: "dashed",
+            showArrow: false,
+        }),
+
+    // Reset game state LENGKAP termasuk collectedFacts (untuk start session baru)
     resetGame: () =>
         set({
             phase: "countdown",
@@ -357,7 +375,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             maxCombo: 0,
             lives: 3,
             questions: [],
-            collectedFacts: [],
+            collectedFacts: [], // reset collectedFacts untuk session baru
             showMascot: false,
             mascotLives: 3,
             lastScoreGain: null,

@@ -15,6 +15,7 @@ import {
   GraduationCap,
   Lightbulb,
   CheckCircle2,
+  FastForward,
 } from 'lucide-react'
 import type { GameLevel } from '@/types/game'
 
@@ -49,6 +50,25 @@ const CARD_THEMES: Record<GameLevel, {
   },
 }
 
+// ── FALLBACK FACTS jika collectedFacts kosong (game over cepat) ──
+const FALLBACK_FACTS: Record<GameLevel, string[]> = {
+  easy: [
+    '💡 Budgeting adalah cara mengatur pengeluaran agar tidak melebihi pendapatan. Coba metode 50-30-20!',
+    '💡 Dana darurat idealnya 3-6x pengeluaran bulanan. Ini pelindungmu dari situasi tak terduga.',
+    '💡 Menabung di awal bulan (pay yourself first) jauh lebih efektif daripada menabung sisa.',
+  ],
+  medium: [
+    '💡 Impulsive buying bisa menguras 20-30% anggaran. Tunggu 24 jam sebelum beli barang non-esensial!',
+    '💡 Bunga kartu kredit di Indonesia bisa mencapai 24-36% per tahun. Bayar tagihan PENUH tiap bulan!',
+    '💡 Pay Later mudah tapi bisa menjebak. Baca syarat & biaya sebelum menggunakannya.',
+  ],
+  hard: [
+    '💡 Pinjol legal WAJIB terdaftar di OJK. Cek di ojk.go.id sebelum meminjam!',
+    '💡 Diversifikasi investasi mengurangi risiko. Jangan taruh semua telur dalam satu keranjang.',
+    '💡 Bunga berbunga bisa menggandakan hutang dengan cepat. Hati-hati dengan pinjol berbunga harian!',
+  ],
+}
+
 export default function LearnPage() {
   const router = useRouter()
   const collectedFacts = useGameStore(s => s.collectedFacts)
@@ -67,8 +87,10 @@ export default function LearnPage() {
     setIsTouch(typeof window !== 'undefined' && 'ontouchstart' in window)
   }, [])
 
-  // Facts yang belum di-dismiss — max 10 dari collectedFacts
-  const facts = collectedFacts.slice(0, 10)
+  // Fallback facts jika collectedFacts kosong (misal game over terlalu cepat)
+  const facts = collectedFacts.length > 0
+    ? collectedFacts.slice(0, 10)
+    : FALLBACK_FACTS[level]
   const remaining = facts.length - dismissed.length
 
   // Stack: tampilkan max 3 kartu dari atas tumpukan
@@ -214,6 +236,20 @@ export default function LearnPage() {
               }}
             />
           </div>
+
+          {/* Tombol skip ke complete screen */}
+          {!showComplete && facts.length > 0 && dismissed.length < facts.length && (
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={() => setShowComplete(true)}
+                className="text-xs text-gray-400 font-bold flex items-center gap-1
+               hover:text-gray-600 transition-colors"
+              >
+                <FastForward className="w-3 h-3" />
+                Lewati semua
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Hero illustration */}

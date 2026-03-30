@@ -4,14 +4,13 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { GAME_OVER_ILLUSTRATION } from '@/lib/assets'
 import { MascotImage } from '@/components/ui/MascotImage'
-import { RotateCcw, Home, Heart } from 'lucide-react'
+import { GraduationCap, ChevronRight, Heart } from 'lucide-react'
 import { useGameStore } from '@/store/gameStore'
 
 export default function GameOverPage() {
   const router = useRouter()
   const score  = useGameStore(s => s.score)
   const level  = useGameStore(s => s.level) ?? 'easy'
-  const resetGame = useGameStore(s => s.resetGame)
 
   const quotes = [
     "It's okay — every expert was once a beginner.",
@@ -19,15 +18,6 @@ export default function GameOverPage() {
     "We are one step ahead than ever!",
   ]
   const quote = quotes[Math.floor(Math.random() * quotes.length)]
-
-  const handleRestart = () => {
-    resetGame()
-    router.push('/game')
-  }
-
-  const handleHome = () => {
-    router.push('/')
-  }
 
   return (
     // Background: warm dark red/maroon — mournful tapi tidak seram
@@ -143,29 +133,27 @@ export default function GameOverPage() {
           </div>
 
           {/* Buttons */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-3">
+            {/* Tombol utama: ke Ruang Belajar */}
             <button
-              onClick={handleHome}
-              className="flex items-center justify-center gap-2 py-3 rounded-2xl
-                         font-black text-sm transition-all active:scale-95"
+              onClick={() => router.push('/learn')}
+              className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl
+               font-black text-base text-white transition-all active:scale-95"
               style={{
-                background: 'rgba(255,255,255,0.07)',
-                border: '1.5px solid rgba(255,255,255,0.15)',
-                color: '#d1d5db',
+                background: 'linear-gradient(135deg, #16a34a, #15803d)',
+                boxShadow: '0 4px 16px rgba(22, 163, 74, 0.3)',
               }}
             >
-              <Home className="w-4 h-4" />
-              Menu
+              <GraduationCap className="w-5 h-5" />
+              Lihat Fun Facts Dulu
+              <ChevronRight className="w-4 h-4" />
             </button>
-            <button
-              onClick={handleRestart}
-              className="flex items-center justify-center gap-2 py-3 rounded-2xl
-                         font-black text-sm text-white transition-all active:scale-95"
-              style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}
-            >
-              <RotateCcw className="w-4 h-4" />
-              Coba Lagi!
-            </button>
+
+            {/* Sub-label */}
+            <p className="text-center text-xs font-semibold"
+               style={{ color: 'rgba(255,255,255,0.4)' }}>
+              Pelajari materinya — lalu coba lagi!
+            </p>
           </div>
         </div>
       </div>

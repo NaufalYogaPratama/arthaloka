@@ -20,8 +20,8 @@ import {
     Share2,
     Copy,
     GraduationCap,
-    RotateCcw,
     ArrowLeft,
+    ChevronRight,
 } from 'lucide-react'
 
 type RecordResponse = {
@@ -145,9 +145,8 @@ export default function ResultPage() {
         }
     };
 
-    const handleMainAgain = () => {
-        resetGame();
-        router.push("/game");
+    const handleLearn = () => {
+        router.push("/learn");
     };
 
     const handleShareWhatsApp = () => {
@@ -160,10 +159,6 @@ export default function ResultPage() {
             fullShareText
         )}`;
         window.open(url, "_blank", "noopener,noreferrer");
-    };
-
-    const handleLearn = () => {
-        router.push("/learn");
     };
 
     // Not finished state
@@ -409,28 +404,29 @@ export default function ResultPage() {
                     </div>
                 </section>
 
-                {/* CTA Buttons */}
-                <section className="grid grid-cols-2 gap-3 mb-6">
-                    <button
-                        onClick={handleLearn}
-                        className="flex items-center justify-center gap-2 py-3.5 rounded-2xl font-black text-sm transition-all active:scale-95"
-                        style={{
-                            background: "rgba(255,255,255,0.08)",
-                            border: "1.5px solid rgba(255,255,255,0.15)",
-                            color: "#e2e8f0",
-                        }}
-                    >
-                        <GraduationCap className="w-4 h-4" />
-                        Ruang Belajar
-                    </button>
-                    <button
-                        onClick={handleMainAgain}
-                        className="flex items-center justify-center gap-2 py-3.5 rounded-2xl font-black text-sm text-white transition-all active:scale-95"
-                        style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)" }}
-                    >
-                        <RotateCcw className="w-4 h-4" />
-                        Main Lagi
-                    </button>
+                {/* CTA Buttons - HANYA tombol Lihat Fun Facts */}
+                <section className="mb-6">
+                    <div className="mt-5">
+                        <button
+                            onClick={() => router.push('/learn')}
+                            className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl
+               font-black text-lg text-white transition-all active:scale-95
+               hover:opacity-90"
+                            style={{
+                                background: 'linear-gradient(135deg, #16a34a, #15803d)',
+                                boxShadow: '0 4px 20px rgba(22, 163, 74, 0.35)',
+                            }}
+                        >
+                            <GraduationCap className="w-5 h-5" />
+                            Lihat Fun Facts
+                            <ChevronRight className="w-5 h-5" />
+                        </button>
+
+                        {/* Sub-label kecil sebagai hint */}
+                        <p className="text-center text-xs text-gray-500 mt-2 font-semibold">
+                            Baca dulu, baru main lagi!
+                        </p>
+                    </div>
                 </section>
 
                 {/* Footer Logo */}
