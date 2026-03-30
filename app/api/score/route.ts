@@ -97,33 +97,60 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Ensure user exists (NextAuth JWT doesn't automatically create a User row).
+        // Ensure user exists — handle email unique constraint
         const sessionUserName = sessionUser?.name ?? undefined;
         const sessionUserEmail = sessionUser?.email ?? undefined;
-        const sessionAuthProvider = sessionUser?.authProvider ?? undefined;
+        const sessionAuthProvider = sessionUser?.authProvider ?? "GUEST";
 
-        await prisma.user.upsert({
-            where: { id: sessionUserId },
-            update: {
-                name: sessionUserName ?? null,
-                email: sessionUserEmail ?? null,
-            },
-            create: {
-                id: sessionUserId,
-                name: sessionUserName ?? null,
-                email: sessionUserEmail ?? null,
-                authProvider: sessionAuthProvider ?? "GUEST",
-            },
-        });
+        // Try to upsert by ID first
+        try {
+            await prisma.user.upsert({
+                where: { id: sessionUserId },
+                update: {
+                    name: sessionUserName ?? null,
+                    email: sessionUserEmail ?? null,
+                },
+                create: {
+                    id: sessionUserId,
+                    name: sessionUserName ?? null,
+                    email: sessionUserEmail ?? null,
+                    authProvider: sessionAuthProvider,
+                },
+            });
+        } catch (e: unknown) {
+            // If email conflict (P2002), update the existing user by email
+            const isEmailConflict = 
+                typeof e === "object" && 
+                e !== null && 
+                "code" in e && 
+                (e as { code: string }).code === "P2002" &&
+                "meta" in e &&
+                typeof (e as { meta?: { target?: string[] } }).meta?.target?.includes === "function" &&
+                (e as { meta: { target: string[] } }).meta.target.includes("email");
+
+            if (isEmailConflict && sessionUserEmail) {
+                // Update existing user by email
+                await prisma.user.update({
+                    where: { email: sessionUserEmail },
+                    data: {
+                        id: sessionUserId, // Take over this ID
+                        name: sessionUserName ?? null,
+                        authProvider: sessionAuthProvider,
+                    },
+                });
+            } else {
+                throw e; // Re-throw if not an email conflict we can handle
+            }
+        }
 
         const computedScore =
             score +
             (livesRemaining === 3 ? PERFECT_CLEAR_BONUS : 0);
 
+        // Get previous best untuk response (optional, bisa null)
         const prevEntry = await prisma.leaderboard.findFirst({
             where: { userId: sessionUserId, level: prismaLevel },
         });
-
         const previousBest = prevEntry?.highestScore ?? 0;
         const isNewRecord = computedScore > previousBest;
 
@@ -138,23 +165,21 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        // Update leaderboard only if it's a new peak.
-        if (prevEntry) {
-            if (isNewRecord) {
-                await prisma.leaderboard.update({
-                    where: { id: prevEntry.id },
-                    data: { highestScore: computedScore },
-                });
-            }
-        } else {
-            await prisma.leaderboard.create({
-                data: {
+        // Upsert leaderboard — atomic operation, no race condition
+        await prisma.leaderboard.upsert({
+            where: {
+                userId_level: {
                     userId: sessionUserId,
                     level: prismaLevel,
-                    highestScore: computedScore,
                 },
-            });
-        }
+            },
+            update: isNewRecord ? { highestScore: computedScore } : {},
+            create: {
+                userId: sessionUserId,
+                level: prismaLevel,
+                highestScore: computedScore,
+            },
+        });
 
         return NextResponse.json({
             isNewRecord,

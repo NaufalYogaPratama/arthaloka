@@ -44,6 +44,14 @@ const config: Config = {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
         },
+        confettiFall: {
+          '0%': { transform: 'translateY(-20px) rotate(0deg)', opacity: '0.8' },
+          '100%': { transform: 'translateY(100vh) rotate(720deg)', opacity: '0' },
+        },
+        shimmer: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
       },
       animation: {
         shake: 'shake 0.4s ease-in-out',
@@ -51,6 +59,8 @@ const config: Config = {
         'slide-up': 'slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
         'slide-down': 'slideDown 0.25s ease-in',
         'fade-overlay': 'fadeOverlay 0.2s ease',
+        'confetti-fall': 'confettiFall 4s ease-in infinite',
+        shimmer: 'shimmer 3s ease infinite',
       },
     },
   },

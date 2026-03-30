@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { PERFECT_CLEAR_BONUS } from "@/lib/scoring";
@@ -16,42 +15,19 @@ import {
     Target,
     Trophy,
     Heart,
+    Zap,
     MessageCircle,
     Share2,
     Copy,
     GraduationCap,
     RotateCcw,
-    ArrowLeft
+    ArrowLeft,
 } from 'lucide-react'
 
 type RecordResponse = {
     isNewRecord: boolean;
     previousBest: number;
 };
-
-type ConfettiPiece = {
-    dx: number;
-    dy: number;
-    rot: number;
-    delay: number;
-    color: string;
-};
-
-function makeConfettiPieces(count: number): ConfettiPiece[] {
-    const colors = ["#fbbf24", "#f59e0b", "#60a5fa", "#34d399", "#fb7185", "#a78bfa"];
-    const pieces: ConfettiPiece[] = [];
-
-    for (let i = 0; i < count; i++) {
-        const dx = (Math.random() - 0.5) * 420; // spread left/right
-        const dy = 220 + Math.random() * 220; // fall down
-        const rot = (Math.random() - 0.5) * 540;
-        const delay = Math.random() * 220;
-        const color = colors[i % colors.length];
-        pieces.push({ dx, dy, rot, delay, color });
-    }
-
-    return pieces;
-}
 
 export default function ResultPage() {
     const router = useRouter();
@@ -94,17 +70,6 @@ export default function ResultPage() {
     );
     const [copied, setCopied] = useState(false);
     const postOnceRef = useRef(false);
-    const [confettiKey, setConfettiKey] = useState(0);
-
-    const confettiPieces = useMemo(() => {
-        if (!record?.isNewRecord) return [];
-        return makeConfettiPieces(26);
-    }, [record?.isNewRecord]);
-
-    useEffect(() => {
-        if (!record?.isNewRecord) return;
-        setConfettiKey((k) => k + 1);
-    }, [record?.isNewRecord]);
 
     useEffect(() => {
         const canSubmit =
@@ -117,7 +82,6 @@ export default function ResultPage() {
 
         const submitAndLoad = async () => {
             try {
-                // 1) Submit score (server will add PERFECT CLEAR bonus).
                 const scoreRes = await fetch("/api/score", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -137,7 +101,6 @@ export default function ResultPage() {
                 const recordData = (await scoreRes.json()) as RecordResponse;
                 setRecord(recordData);
 
-                // 2) Load leaderboard for this level.
                 const lbRes = await fetch(
                     `/api/leaderboard?level=${encodeURIComponent(level)}`
                 );
@@ -199,22 +162,30 @@ export default function ResultPage() {
         window.open(url, "_blank", "noopener,noreferrer");
     };
 
+    const handleLearn = () => {
+        router.push("/learn");
+    };
+
+    // Not finished state
     if (phase !== "finished" || !level) {
         return (
-            <main className="min-h-screen bg-brand-pattern-light bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center px-4 relative">
-                <div className="absolute z-0 top-[-60px] left-[-40px] w-[200px] h-[200px] rounded-full bg-green-200/30 blur-2xl" />
-                <div className="absolute z-0 bottom-[-60px] right-[-40px] w-[220px] h-[220px] rounded-full bg-teal-200/25 blur-3xl" />
-                <div className="bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl p-8 max-w-md text-center relative z-10">
-                    <Target className="w-16 h-16 text-amber-500 mx-auto mb-3" />
-                    <h1 className="font-fredoka text-2xl font-bold text-gray-800 mb-2">
+            <main
+                className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
+                style={{
+                    background: "linear-gradient(160deg, #0f0c29 0%, #302b63 50%, #24243e 100%)",
+                }}
+            >
+                <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 max-w-md text-center">
+                    <Trophy className="w-16 h-16 text-amber-400 mx-auto mb-3" />
+                    <h1 className="font-fredoka text-2xl font-bold text-white mb-2">
                         Hasil belum siap
                     </h1>
-                    <p className="text-gray-600 text-sm mb-6">
-                        Selesaikan permainan terlebih dahulu untuk melihat
-                        skor dan leaderboard.
+                    <p className="text-gray-300 text-sm mb-6">
+                        Selesaikan permainan terlebih dahulu untuk melihat skor dan leaderboard.
                     </p>
                     <button
-                        className="w-full py-3 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold shadow-lg shadow-green-500/25 hover:shadow-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                        className="w-full py-3 rounded-2xl font-bold shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-white"
+                        style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)" }}
                         onClick={() => router.push("/level-select")}
                     >
                         <ArrowLeft className="w-4 h-4" /> Kembali pilih level
@@ -225,143 +196,166 @@ export default function ResultPage() {
     }
 
     return (
-        <main className="min-h-screen bg-brand-pattern-light bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex flex-col relative overflow-hidden">
-            {/* Decorative circles */}
-            <div className="absolute z-0 top-[-60px] left-[-40px] w-[200px] h-[200px] rounded-full bg-green-200/30 blur-2xl" />
-            <div className="absolute z-0 bottom-[-60px] right-[-40px] w-[220px] h-[220px] rounded-full bg-teal-200/25 blur-3xl" />
+        <main
+            className="min-h-screen flex flex-col relative overflow-hidden"
+            style={{
+                background: "linear-gradient(160deg, #0f0c29 0%, #302b63 50%, #24243e 100%)",
+            }}
+        >
+            {/* Confetti CSS particles — purely decorative */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+                {Array.from({ length: 20 }).map((_, i) => (
+                    <div
+                        key={i}
+                        className="absolute rounded-full animate-[confettiFall_4s_ease-in_infinite]"
+                        style={{
+                            width: `${4 + (i % 4) * 3}px`,
+                            height: `${4 + (i % 4) * 3}px`,
+                            left: `${(i * 5 + 3) % 100}%`,
+                            top: "-20px",
+                            background: ["#f59e0b", "#22c55e", "#3b82f6", "#a855f7", "#ef4444"][i % 5],
+                            animationDelay: `${(i * 0.3) % 3}s`,
+                            animationDuration: `${3 + (i % 3)}s`,
+                            opacity: 0.7,
+                        }}
+                    />
+                ))}
+            </div>
 
-            <div className="relative z-10 max-w-4xl mx-auto px-4 py-10 md:py-14 w-full">
-                <div className="flex flex-col items-center text-center">
-                    <div className="flex items-center gap-2 mb-4">
-                        <Trophy className="w-8 h-8 text-amber-500" />
-                        <h1 className="font-fredoka text-3xl md:text-4xl font-bold text-gray-800">
-                            Hasil Permainan
-                        </h1>
+            <div className="relative z-10 max-w-lg mx-auto px-4 py-6 w-full">
+                {/* Header */}
+                <div className="flex items-center justify-center gap-2 mb-6">
+                    <Trophy className="w-6 h-6 text-amber-400" />
+                    <h1 className="font-fredoka text-xl font-black text-white tracking-wide">
+                        HASIL PERMAINAN
+                    </h1>
+                </div>
+
+                {/* VICTORY ILLUSTRATION */}
+                <div className="rounded-2xl overflow-hidden mb-5 shadow-2xl"
+                    style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+                    <Image
+                        src={VICTORY_ILLUSTRATION.src}
+                        alt="Selamat! Kamu berhasil menyelesaikan ArthaLoka!"
+                        width={VICTORY_ILLUSTRATION.width}
+                        height={VICTORY_ILLUSTRATION.height}
+                        className="w-full h-auto object-cover"
+                        style={{ width: "100%", height: "auto" }}
+                        priority
+                    />
+                </div>
+
+                {/* Score Hero Number */}
+                <div className="text-center mb-5">
+                    <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">
+                        TOTAL POIN
+                    </p>
+
+                    {/* Score number dengan glow */}
+                    <div className="relative inline-block">
+                        {/* Glow layer */}
+                        <p
+                            className="absolute inset-0 text-center blur-xl opacity-60 select-none font-black"
+                            style={{
+                                fontSize: "clamp(56px, 12vw, 80px)",
+                                color: "#fbbf24",
+                                lineHeight: 1,
+                            }}
+                        >
+                            {totalScore.toLocaleString("id-ID")}
+                        </p>
+                        {/* Actual text */}
+                        <p
+                            className="relative font-black tabular-nums"
+                            style={{
+                                fontSize: "clamp(56px, 12vw, 80px)",
+                                lineHeight: 1,
+                                background: "linear-gradient(180deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)",
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                                backgroundClip: "text",
+                            }}
+                        >
+                            {totalScore.toLocaleString("id-ID")}
+                        </p>
                     </div>
 
-                    {/* NEW RECORD banner */}
+                    {/* New Record & Perfect Clear banners */}
                     {record?.isNewRecord && (
-                        <div className="w-full max-w-xl animate-[popIn_0.4s_cubic-bezier(0.34,1.56,0.64,1)] mb-4">
+                        <div className="mt-3 flex justify-center">
                             <Image
                                 src={NEW_RECORD_BANNER.src}
                                 alt="New Record!"
-                                width={NEW_RECORD_BANNER.width}
-                                height={NEW_RECORD_BANNER.height}
-                                className="w-full h-auto object-contain"
-                                style={{ width: '100%', height: 'auto' }}
+                                width={280}
+                                height={Math.round(280 * (305 / 1345))}
+                                className="object-contain animate-[popIn_0.4s_cubic-bezier(0.34,1.56,0.64,1)]"
+                                style={{ width: 280, height: "auto" }}
                                 priority
                             />
                         </div>
                     )}
-
-                    {/* PERFECT CLEAR banner */}
                     {perfectClear && (
-                        <div className="w-full max-w-xl mb-4">
+                        <div className="mt-2 flex justify-center">
                             <Image
                                 src={PERFECT_CLEAR_BANNER.src}
                                 alt="Perfect Clear!"
-                                width={PERFECT_CLEAR_BANNER.width}
-                                height={PERFECT_CLEAR_BANNER.height}
-                                className="w-full h-auto object-contain drop-shadow-lg"
-                                style={{ width: '100%', height: 'auto' }}
+                                width={220}
+                                height={Math.round(220 * (165 / 865))}
+                                className="object-contain"
+                                style={{ width: 220, height: "auto" }}
                             />
                         </div>
                     )}
+                </div>
 
-                    {/* VICTORY ILLUSTRATION */}
-                    <div className="w-full max-w-xl rounded-2xl overflow-hidden mb-6 mt-2 relative z-10">
-                        <Image
-                            src={VICTORY_ILLUSTRATION.src}
-                            alt="Selamat! Kamu berhasil menyelesaikan ArthaLoka!"
-                            width={VICTORY_ILLUSTRATION.width}
-                            height={VICTORY_ILLUSTRATION.height}
-                            className="w-full h-auto object-cover"
-                            style={{ width: '100%', height: 'auto' }}
-                            priority
-                        />
-                    </div>
-
-                    {/* Confetti */}
-                    {record?.isNewRecord && (
-                        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-                            <div
-                                key={confettiKey}
-                                className="relative w-full h-full"
+                {/* Stats Row */}
+                <div className="grid grid-cols-3 gap-3 mb-5">
+                    {[
+                        { label: "Level", value: levelLabel, icon: <Target className="w-4 h-4" />, color: "#22c55e" },
+                        { label: "Max Combo", value: `${maxCombo}×`, icon: <Zap className="w-4 h-4" />, color: "#f59e0b" },
+                        { label: "Nyawa Sisa", value: livesRemaining > 0 ? livesRemaining : "—", icon: <Heart className="w-4 h-4" />, color: "#ef4444" },
+                    ].map(({ label, value, icon, color }) => (
+                        <div
+                            key={label}
+                            className="rounded-xl p-3 text-center"
+                            style={{
+                                background: "rgba(255,255,255,0.06)",
+                                border: `1px solid ${color}33`,
+                            }}
+                        >
+                            <div className="flex justify-center mb-1" style={{ color }}>{icon}</div>
+                            <p className="text-gray-400 text-[9px] font-bold uppercase tracking-wide mb-0.5">{label}</p>
+                            <p
+                                className="text-white font-black text-lg leading-tight"
+                                style={{ fontFamily: "var(--font-fredoka), Fredoka, cursive" }}
                             >
-                                {confettiPieces.map((p, idx) => {
-                                    const style: CSSProperties =
-                                        {
-                                            ["--dx" as string]: `${p.dx}px`,
-                                            ["--dy" as string]: `${p.dy}px`,
-                                            ["--rot" as string]: `${p.rot}deg`,
-                                            ["--delay" as string]: `${p.delay}ms`,
-                                            ["--pieceColor" as string]:
-                                                p.color,
-                                        } as CSSProperties;
-
-                                    return (
-                                        <span
-                                            key={idx}
-                                            className="confetti-piece"
-                                            style={style}
+                                {value}
+                            </p>
+                            {/* Heart icons untuk nyawa sisa */}
+                            {label === "Nyawa Sisa" && typeof value === "number" && (
+                                <div className="flex justify-center gap-0.5 mt-1">
+                                    {[1, 2, 3].map((n) => (
+                                        <Heart
+                                            key={n}
+                                            className={`w-3 h-3 ${n <= livesRemaining ? "fill-red-500 text-red-500" : "fill-gray-700 text-gray-700"}`}
                                         />
-                                    );
-                                })}
-                            </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
-                    )}
-
-                    {/* Total score */}
-                    <div className="w-full max-w-xl rounded-3xl bg-white/80 backdrop-blur-xl border border-white/50 shadow-2xl p-6 md:p-8 mb-6">
-                        <p className="text-sm text-gray-500 mb-1 font-semibold">
-                            Total Poin
-                        </p>
-                        <div className="flex items-baseline justify-center gap-3">
-                            <span
-                                className={`font-fredoka text-6xl md:text-7xl font-bold text-amber-500 drop-shadow-lg ${record?.isNewRecord
-                                    ? "animate-glowPulse"
-                                    : ""
-                                    }`}
-                            >
-                                {totalScore}
-                            </span>
-                            <Target className="w-6 h-6 text-amber-400" />
-                        </div>
-                    </div>
-
-                    {/* Stats grid */}
-                    <div className="w-full max-w-xl grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                        <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-4 text-center">
-                            <p className="text-xs text-gray-500 font-semibold">
-                                Level
-                            </p>
-                            <p className="font-fredoka text-xl font-bold text-gray-800">
-                                {levelLabel}
-                            </p>
-                        </div>
-                        <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-4 text-center">
-                            <p className="text-xs text-gray-500 font-semibold">
-                                Max Combo
-                            </p>
-                            <p className="font-fredoka text-xl font-bold text-gray-800">
-                                {maxCombo}
-                            </p>
-                        </div>
-                        <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-4 text-center">
-                            <p className="text-xs text-gray-500 font-semibold">
-                                Nyawa Sisa
-                            </p>
-                            <p className="font-fredoka text-xl font-bold text-gray-800 flex items-center justify-center gap-1.5">
-                                {livesRemaining} <Heart className="w-5 h-5 fill-red-500 text-red-500" />
-                            </p>
-                        </div>
-                    </div>
+                    ))}
                 </div>
 
                 {/* Leaderboard */}
-                <section className="mb-8">
+                <section className="mb-5">
                     {isPosting ? (
-                        <div className="bg-white/70 border border-white/50 rounded-2xl p-6 text-center text-gray-600">
+                        <div
+                            className="rounded-2xl p-6 text-center text-gray-400"
+                            style={{
+                                background: "rgba(255,255,255,0.04)",
+                                border: "1px solid rgba(255,255,255,0.1)",
+                            }}
+                        >
                             Memuat leaderboard...
                         </div>
                     ) : (
@@ -372,53 +366,76 @@ export default function ResultPage() {
                     )}
                 </section>
 
-                {/* Share */}
-                <section className="mb-8">
-                    <div className="bg-white/70 border border-white/50 rounded-2xl p-5">
-                        <h2 className="font-fredoka text-xl font-bold text-gray-800 mb-3">
-                            Share Hasil
-                        </h2>
-                        <div className="flex flex-col sm:flex-row gap-3">
+                {/* Share Section */}
+                <section className="mb-5">
+                    <div
+                        className="rounded-2xl p-4"
+                        style={{
+                            background: "rgba(255,255,255,0.04)",
+                            border: "1px solid rgba(255,255,255,0.08)",
+                        }}
+                    >
+                        <p className="text-gray-400 text-xs font-bold uppercase tracking-widest text-center mb-3">
+                            Bagikan Hasilmu
+                        </p>
+
+                        {/* Share buttons */}
+                        <div className="grid grid-cols-3 gap-2">
                             <button
-                                className="flex-1 py-3 rounded-2xl bg-green-500/90 hover:bg-green-500 text-white font-bold shadow-lg shadow-green-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                                 onClick={handleShareWhatsApp}
+                                className="flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl font-bold text-white text-xs active:scale-95 transition-all"
+                                style={{ background: "#25D366" }}
                             >
-                                <MessageCircle className="w-4 h-4" /> WhatsApp
+                                <MessageCircle className="w-4 h-4" />
+                                WhatsApp
                             </button>
                             <button
-                                className="flex-1 py-3 rounded-2xl bg-sky-500/90 hover:bg-sky-500 text-white font-bold shadow-lg shadow-sky-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                                 onClick={handleShareTwitter}
+                                className="flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl font-bold text-white text-xs active:scale-95 transition-all"
+                                style={{ background: "#1DA1F2" }}
                             >
-                                <Share2 className="w-4 h-4" /> Twitter/X
+                                <Share2 className="w-4 h-4" />
+                                Twitter
                             </button>
                             <button
-                                className="flex-1 py-3 rounded-2xl bg-white border-2 border-gray-200 text-gray-700 font-bold hover:border-amber-300 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                                 onClick={handleCopyLink}
+                                className="flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl font-bold text-white text-xs active:scale-95 transition-all"
+                                style={{ background: "#6b7280" }}
                             >
-                                <Copy className="w-4 h-4" /> {copied ? "Link Disalin!" : "Copy Link"}
+                                <Copy className="w-4 h-4" />
+                                {copied ? "Disalin!" : "Salin"}
                             </button>
                         </div>
                     </div>
                 </section>
 
-                {/* Actions */}
-                <section className="flex flex-col sm:flex-row gap-3">
+                {/* CTA Buttons */}
+                <section className="grid grid-cols-2 gap-3 mb-6">
                     <button
-                        className="flex-1 py-3.5 rounded-2xl bg-white border-2 border-gray-200 text-gray-700 font-bold hover:border-green-400 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-                        onClick={() => router.push("/learn")}
+                        onClick={handleLearn}
+                        className="flex items-center justify-center gap-2 py-3.5 rounded-2xl font-black text-sm transition-all active:scale-95"
+                        style={{
+                            background: "rgba(255,255,255,0.08)",
+                            border: "1.5px solid rgba(255,255,255,0.15)",
+                            color: "#e2e8f0",
+                        }}
                     >
-                        <GraduationCap className="w-4 h-4" /> Ruang Belajar
+                        <GraduationCap className="w-4 h-4" />
+                        Ruang Belajar
                     </button>
                     <button
-                        className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 text-white font-bold shadow-lg shadow-amber-500/20 hover:shadow-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                         onClick={handleMainAgain}
+                        className="flex items-center justify-center gap-2 py-3.5 rounded-2xl font-black text-sm text-white transition-all active:scale-95"
+                        style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)" }}
                     >
-                        <RotateCcw className="w-4 h-4" /> Main Lagi
+                        <RotateCcw className="w-4 h-4" />
+                        Main Lagi
                     </button>
                 </section>
 
-                <div className="flex justify-center mt-10 mb-4 pointer-events-none">
-                    <AppLogo variant="horizontal" size="sm" className="opacity-60 grayscale hover:grayscale-0 transition-all" />
+                {/* Footer Logo */}
+                <div className="flex justify-center mb-4 pointer-events-none">
+                    <AppLogo variant="horizontal" size="sm" className="opacity-40" />
                 </div>
             </div>
         </main>

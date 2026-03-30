@@ -14,9 +14,8 @@ export type LeaderboardRow = {
 function formatDate(value: string | Date) {
     const d = typeof value === "string" ? new Date(value) : value;
     return new Intl.DateTimeFormat("id-ID", {
-        year: "numeric",
+        day: "numeric",
         month: "short",
-        day: "2-digit",
     }).format(d);
 }
 
@@ -28,77 +27,134 @@ export default function LeaderboardTable({
     currentUserId: string | null | undefined;
 }) {
     return (
-        <div className="overflow-hidden rounded-2xl border border-white/50 bg-white/70 backdrop-blur-xl shadow-sm">
-            <div className="px-4 py-3 border-b border-white/50 flex items-center justify-between">
-                <h2 className="font-fredoka text-lg font-bold text-gray-800 flex items-center gap-2">
-                    <Trophy className="w-5 h-5 text-amber-500" /> Leaderboard
-                </h2>
-                <p className="text-xs text-gray-500">
-                    Top {Math.min(10, rows.length)} pemain
-                </p>
+        <div
+            className="rounded-2xl overflow-hidden"
+            style={{
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.1)",
+            }}
+        >
+            {/* Header */}
+            <div
+                className="px-4 py-3 flex items-center justify-between"
+                style={{
+                    background: "linear-gradient(90deg, rgba(245,158,11,0.2), rgba(251,191,36,0.1))",
+                    borderBottom: "1px solid rgba(245,158,11,0.2)",
+                }}
+            >
+                <div className="flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-amber-400" />
+                    <span className="text-amber-300 font-black text-sm tracking-wide">LEADERBOARD</span>
+                </div>
+                <span className="text-gray-500 text-xs">Top {Math.min(5, rows.length)} pemain</span>
             </div>
 
-            <table className="w-full text-left">
-                <thead className="text-xs text-gray-500 bg-white/50">
-                    <tr>
-                        <th className="px-4 py-3">#</th>
-                        <th className="px-4 py-3">Nama</th>
-                        <th className="px-4 py-3 text-right">Skor</th>
-                        <th className="px-4 py-3 text-right">
-                            Terakhir Main
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {rows.map((row) => {
-                        const isCurrent = row.userId === currentUserId;
-                        const medal = getMedalIcon(row.rank);
-                        const medalDisplaySize = 28;
-                        return (
-                            <tr
-                                key={row.userId + row.rank}
-                                className={
-                                    isCurrent
-                                        ? "bg-blue-100/80 font-bold"
-                                        : row.rank <= 3
-                                            ? "hover:bg-gray-50/60 font-bold"
-                                            : "hover:bg-gray-50/60 font-medium"
-                                }
-                            >
-                                <td className="px-4 py-3">
-                                    <div className="flex justify-start flex-shrink-0 w-8">
-                                        {medal ? (
-                                            <Image
-                                                src={medal.src}
-                                                alt={`Rank ${row.rank}`}
-                                                width={Math.round(medalDisplaySize * (medal.width / medal.height))}
-                                                height={medalDisplaySize}
-                                                className="object-contain"
-                                                style={{
-                                                    width: Math.round(medalDisplaySize * (medal.width / medal.height)),
-                                                    height: medalDisplaySize
-                                                }}
-                                            />
-                                        ) : (
-                                            <span className="text-sm text-gray-500 font-bold inline-block px-1">{row.rank}</span>
-                                        )}
+            {/* Column headers */}
+            <div
+                className="grid grid-cols-[40px_1fr_80px_70px] px-4 py-2"
+                style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+            >
+                <span className="text-gray-600 text-[10px] font-bold">#</span>
+                <span className="text-gray-600 text-[10px] font-bold">Nama</span>
+                <span className="text-gray-600 text-[10px] font-bold text-right">Skor</span>
+                <span className="text-gray-600 text-[10px] font-bold text-right">Tgl</span>
+            </div>
+
+            {/* Rows */}
+            <div>
+                {rows.slice(0, 5).map((row, idx) => {
+                    const rank = idx + 1;
+                    const isCurrentUser = row.userId === currentUserId;
+                    const medal = getMedalIcon(rank);
+
+                    // Row background per rank
+                    const rowBg =
+                        rank === 1
+                            ? "linear-gradient(90deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05))"
+                            : rank === 2
+                                ? "linear-gradient(90deg, rgba(148,163,184,0.12), rgba(148,163,184,0.04))"
+                                : rank === 3
+                                    ? "linear-gradient(90deg, rgba(180,120,60,0.12), rgba(180,120,60,0.04))"
+                                    : isCurrentUser
+                                        ? "rgba(59,130,246,0.1)"
+                                        : "transparent";
+
+                    return (
+                        <div
+                            key={row.userId + row.rank}
+                            className="grid grid-cols-[40px_1fr_80px_70px] px-4 py-2.5 items-center"
+                            style={{
+                                background: rowBg,
+                                borderBottom:
+                                    idx < rows.slice(0, 5).length - 1
+                                        ? "1px solid rgba(255,255,255,0.04)"
+                                        : "none",
+                            }}
+                        >
+                            {/* Rank / Medal */}
+                            <div>
+                                {rank <= 3 && medal ? (
+                                    <Image
+                                        src={medal.src}
+                                        alt={`Rank ${rank}`}
+                                        width={24}
+                                        height={Math.round(24 * (medal.height / medal.width))}
+                                        className="object-contain"
+                                        style={{ width: 24, height: "auto" }}
+                                    />
+                                ) : (
+                                    <div
+                                        className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black"
+                                        style={{ background: "rgba(255,255,255,0.08)", color: "#9ca3af" }}
+                                    >
+                                        {rank}
                                     </div>
-                                </td>
-                                <td className={`px-4 py-3 font-semibold ${row.rank === 1 ? 'text-amber-700' : row.rank === 2 ? 'text-gray-600' : row.rank === 3 ? 'text-orange-700' : 'text-gray-800'}`}>
-                                    {row.playerName} {isCurrent && <span className="text-blue-600 text-xs ml-1">(Kamu)</span>}
-                                </td>
-                                <td className={`px-4 py-3 text-right font-fredoka font-black ${row.rank === 1 ? 'text-amber-600' : 'text-amber-500'}`}>
-                                    {row.highestScore}
-                                </td>
-                                <td className="px-4 py-3 text-right text-xs text-gray-500">
-                                    {formatDate(row.updatedAt)}
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+                                )}
+                            </div>
+
+                            {/* Player name */}
+                            <div className="min-w-0">
+                                <p
+                                    className="text-sm font-bold truncate"
+                                    style={{
+                                        color:
+                                            rank === 1
+                                                ? "#fcd34d"
+                                                : rank === 2
+                                                    ? "#cbd5e1"
+                                                    : rank === 3
+                                                        ? "#d97706"
+                                                        : isCurrentUser
+                                                            ? "#93c5fd"
+                                                            : "#e2e8f0",
+                                    }}
+                                >
+                                    {row.playerName}
+                                    {isCurrentUser && (
+                                        <span className="ml-1 text-[9px] text-blue-400 font-black">(Kamu)</span>
+                                    )}
+                                </p>
+                            </div>
+
+                            {/* Score */}
+                            <p
+                                className="text-right font-black tabular-nums text-sm"
+                                style={{
+                                    fontFamily: "var(--font-fredoka), Fredoka, cursive",
+                                    color: rank <= 3 ? "#fbbf24" : "#e2e8f0",
+                                }}
+                            >
+                                {row.highestScore.toLocaleString("id-ID")}
+                            </p>
+
+                            {/* Date */}
+                            <p className="text-right text-[10px] text-gray-500 font-medium">
+                                {formatDate(row.updatedAt)}
+                            </p>
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
 }
-
