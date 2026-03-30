@@ -19,7 +19,7 @@ const fredoka = Fredoka({
 });
 
 export const metadata: Metadata = {
-  title: "ArthaLoka — Belajar Keuangan, Main Engklek!",
+  title: "ArthaLoka",
   description:
     "Game edukasi literasi keuangan berbasis permainan tradisional Engklek.",
   icons: {

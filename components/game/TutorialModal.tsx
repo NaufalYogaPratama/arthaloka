@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import Image from 'next/image'
 import { MascotImage } from '@/components/ui/MascotImage'
 import { TUTORIAL_ILLUSTRATION } from '@/lib/assets'
@@ -11,10 +11,10 @@ import { Circle, MoveUp, MessageSquare, AlertTriangle, Sparkles } from 'lucide-r
 const TUTO_DISPLAY_H = (displayW: number) => Math.round(displayW / (1350 / 410))
 
 export function TutorialModal({ onClose }: { onClose: () => void }) {
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         try { localStorage.setItem('arthaloka_tutorial_seen', '1') } catch { }
         onClose()
-    }
+    }, [onClose])
 
     return (
         <div className="fixed inset-0 z-[500] flex items-center justify-center
@@ -47,10 +47,10 @@ export function TutorialModal({ onClose }: { onClose: () => void }) {
                 {/* Step labels di bawah ilustrasi */}
                 <div className="grid grid-cols-3 gap-2 mb-5 text-center">
                     {[
-                        ['1', 'Lempar Batu', <Circle className="w-5 h-5 fill-gray-500 mx-auto" />],
-                        ['2', 'Lompati Petak', <MoveUp className="w-5 h-5 mx-auto" />],
-                        ['3', 'Jawab Kuis', <MessageSquare className="w-5 h-5 mx-auto" />],
-                    ].map(([num, label, icon], idx) => (
+                        ['Lempar Batu', <Circle key="step-1" className="w-5 h-5 fill-gray-500 mx-auto" />],
+                        ['Lompati Petak', <MoveUp key="step-2" className="w-5 h-5 mx-auto" />],
+                        ['Jawab Kuis', <MessageSquare key="step-3" className="w-5 h-5 mx-auto" />],
+                    ].map(([label, icon], idx) => (
                         <div key={idx} className="bg-green-50 rounded-xl p-2 border border-green-100 flex flex-col items-center justify-center">
                             {icon}
                             <p className="text-[10px] font-bold text-green-800 mt-1">{label}</p>

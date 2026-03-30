@@ -77,7 +77,7 @@ export default function LearnPage() {
     .filter(({ originalIdx }) => !dismissed.includes(originalIdx))
     .slice(0, 3)
 
-  const handleSwipe = useCallback((direction: 'left' | 'right') => {
+  const handleSwipe = useCallback((_direction: 'left' | 'right') => {
     if (activeStack.length === 0) return
     const topCard = activeStack[0]
     setDismissed(prev => [...prev, topCard.originalIdx])
