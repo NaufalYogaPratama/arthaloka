@@ -135,9 +135,9 @@ export default function QuizModal({
             </div>
 
             {/* Question counter */}
-            <span className="text-xs text-gray-500 font-bold">
+            {/* <span className="text-xs text-gray-500 font-bold">
               No. {qNum + 1} / 10
-            </span>
+            </span> */}
           </div>
 
           {/* ── ROW 2: Mascot + Question ── */}

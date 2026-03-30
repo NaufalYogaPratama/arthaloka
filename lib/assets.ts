@@ -51,7 +51,7 @@ const CHARACTER_EXPR_FILES: Record<GameLevel, ExprFile> = {
         action: '/assets/karakter-easy-action.png',
         correct: '/assets/karakter-easy-correct.png',
         wrong: '/assets/karakter-easy-wrong.png',
-        // easy tidak punya 'over' → fallback ke wrong
+        over: '/assets/karakter-easy-over.png',
     },
     medium: {
         idle: '/assets/karakter-medium-idle.png',
