@@ -32,10 +32,25 @@ const config: Config = {
           '0%': { opacity: '0', transform: 'scale(0.7)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
         },
+        slideUp: {
+          '0%': { transform: 'translateY(100%)' },
+          '100%': { transform: 'translateY(0)' },
+        },
+        slideDown: {
+          '0%': { transform: 'translateY(0)' },
+          '100%': { transform: 'translateY(100%)' },
+        },
+        fadeOverlay: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
       },
       animation: {
         shake: 'shake 0.4s ease-in-out',
         popIn: 'popIn 0.3s cubic-bezier(0.34,1.56,0.64,1)',
+        'slide-up': 'slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+        'slide-down': 'slideDown 0.25s ease-in',
+        'fade-overlay': 'fadeOverlay 0.2s ease',
       },
     },
   },
