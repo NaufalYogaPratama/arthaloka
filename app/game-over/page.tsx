@@ -6,6 +6,7 @@ import { useGameStore } from "@/store/gameStore";
 import Image from "next/image";
 import { GAME_OVER_ILLUSTRATION } from "@/lib/assets";
 import { MascotImage } from "@/components/ui/MascotImage";
+import { Sprout, Waves, Flame, RotateCcw, Home } from 'lucide-react'
 
 export default function GameOverPage() {
     const router = useRouter();
@@ -14,7 +15,7 @@ export default function GameOverPage() {
     const resetGame = useGameStore((s) => s.resetGame);
 
     const levelLabel = level
-        ? { easy: "Easy 🌱", medium: "Medium 🌊", hard: "Hard 🔥" }[level]
+        ? { easy: "Easy", medium: "Medium", hard: "Hard" }[level]
         : "—";
 
     const handleRestart = () => {
@@ -83,13 +84,13 @@ export default function GameOverPage() {
                         onClick={handleRestart}
                         className="flex-1 bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-extrabold text-base py-3.5 px-5 rounded-2xl transition-all duration-150 flex items-center justify-center gap-2 shadow-sm"
                     >
-                        🔄 Coba Lagi!
+                        <RotateCcw className="w-5 h-5" /> Coba Lagi!
                     </button>
                     <button
                         onClick={handleHome}
                         className="flex-1 bg-white hover:bg-gray-50 active:scale-95 text-gray-700 font-extrabold text-base py-3.5 px-5 rounded-2xl border-2 border-gray-200 transition-all duration-150 flex items-center justify-center gap-2"
                     >
-                        🏠 Menu
+                        <Home className="w-5 h-5" /> Menu
                     </button>
                 </div>
             </motion.div>

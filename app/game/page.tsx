@@ -216,11 +216,11 @@ export default function GamePage() {
                 break;
 
             case "throwing":
-                setStatusText("Melempar batu! 🪨");
+                setStatusText("Melempar batu!");
                 break;
 
             case "jumping_fwd":
-                setStatusText("Melompat maju! 🦘");
+                setStatusText("Melompat maju!");
                 if (stonePosition) {
                     const fwdPath = getForwardPath(stonePosition);
                     const fwdSeq = ["1", "2-3", "4", "5-6", "7"];
@@ -249,12 +249,12 @@ export default function GamePage() {
                 break;
 
             case "quiz1":
-                setStatusText("📝 Quiz Maju! Jawab pertanyaan...");
+                setStatusText("Quiz Maju! Jawab pertanyaan...");
                 // Quiz modal handles this phase
                 break;
 
             case "jumping_continue":
-                setStatusText("Melanjutkan lompatan! 🦘");
+                setStatusText("Melanjutkan lompatan!");
                 if (stonePosition) {
                     const fwdPath = getForwardPath(stonePosition);
                     const fwdSeq = ["1", "2-3", "4", "5-6", "7"];
@@ -274,14 +274,14 @@ export default function GamePage() {
                 break;
 
             case "at_head":
-                setStatusText("Di ujung! Berbalik... 🔄");
+                setStatusText("Di ujung! Berbalik...");
                 timer = setTimeout(() => {
                     setPhase("jumping_back");
                 }, 800);
                 break;
 
             case "jumping_back":
-                setStatusText("Melompat mundur! 🦘");
+                setStatusText("Melompat mundur!");
                 if (stonePosition) {
                     const backPath = getBackwardPath(stonePosition);
                     const backSeq = [
@@ -327,11 +327,11 @@ export default function GamePage() {
                 break;
 
             case "quiz2":
-                setStatusText("📝 Quiz Ambil Batu! Jawab pertanyaan...");
+                setStatusText("Quiz Ambil Batu! Jawab pertanyaan...");
                 break;
 
             case "pickup":
-                setStatusText("Mengambil batu! 🪨");
+                setStatusText("Mengambil batu!");
                 if (stonePosition) {
                     const backPath = getBackwardPath(stonePosition);
                     const backSeq = [
@@ -373,8 +373,8 @@ export default function GamePage() {
             case "round_done":
                 setStatusText(
                     roundNum >= 4
-                        ? "🎉 Permainan selesai!"
-                        : `✅ Jalan ${roundNum + 1} selesai!`
+                        ? "Permainan selesai!"
+                        : `Jalan ${roundNum + 1} selesai!`
                 );
                 timer = setTimeout(() => {
                     nextPhase();
@@ -382,7 +382,7 @@ export default function GamePage() {
                 break;
 
             case "finished":
-                setStatusText("🏆 Selesai! Lihat hasil...");
+                setStatusText("Selesai! Lihat hasil...");
                 break;
         }
 

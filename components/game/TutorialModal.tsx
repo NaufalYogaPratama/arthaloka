@@ -4,6 +4,7 @@ import React from 'react'
 import Image from 'next/image'
 import { MascotImage } from '@/components/ui/MascotImage'
 import { TUTORIAL_ILLUSTRATION } from '@/lib/assets'
+import { Circle, MoveUp, MessageSquare, AlertTriangle, Sparkles } from 'lucide-react'
 
 // tutorial-ilustration.png: 1350×410 → ratio 3.29:1 (sangat wide/landscape)
 // Display: full width, height auto → di 360px wide, height ≈ 110px
@@ -46,24 +47,26 @@ export function TutorialModal({ onClose }: { onClose: () => void }) {
                 {/* Step labels di bawah ilustrasi */}
                 <div className="grid grid-cols-3 gap-2 mb-5 text-center">
                     {[
-                        ['1', 'Lempar Batu', '🪨'],
-                        ['2', 'Lompati Petak', '🦘'],
-                        ['3', 'Jawab Kuis', '❓'],
-                    ].map(([num, label, emoji]) => (
-                        <div key={num} className="bg-green-50 rounded-xl p-2 border border-green-100">
-                            <span className="text-lg">{emoji}</span>
-                            <p className="text-[10px] font-bold text-green-800 mt-0.5">{label}</p>
+                        ['1', 'Lempar Batu', <Circle className="w-5 h-5 fill-gray-500 mx-auto" />],
+                        ['2', 'Lompati Petak', <MoveUp className="w-5 h-5 mx-auto" />],
+                        ['3', 'Jawab Kuis', <MessageSquare className="w-5 h-5 mx-auto" />],
+                    ].map(([num, label, icon], idx) => (
+                        <div key={idx} className="bg-green-50 rounded-xl p-2 border border-green-100 flex flex-col items-center justify-center">
+                            {icon}
+                            <p className="text-[10px] font-bold text-green-800 mt-1">{label}</p>
                         </div>
                     ))}
                 </div>
 
                 {/* Rules ringkas */}
                 <div className="bg-amber-50 rounded-xl p-3 mb-5 border border-amber-200 shadow-sm">
-                    <p className="text-xs font-bold text-amber-800 mb-1">⚠️ Ingat!</p>
+                    <p className="text-xs font-bold text-amber-800 mb-1 flex items-center gap-1">
+                        <AlertTriangle className="w-4 h-4" /> Ingat!
+                    </p>
                     <ul className="text-xs text-amber-700 space-y-0.5 list-disc list-inside font-medium">
                         <li>3 nyawa total untuk 10 level</li>
-                        <li>Jawab beruntun → combo multiplier naik!</li>
-                        <li>Selesaikan tanpa salah → Perfect Clear +500 pts</li>
+                        <li>Jawab beruntun -{">"} combo multiplier naik!</li>
+                        <li>Selesaikan tanpa salah -{">"} Perfect Clear +500 pts</li>
                     </ul>
                 </div>
 
@@ -74,7 +77,7 @@ export function TutorialModal({ onClose }: { onClose: () => void }) {
                      text-white font-extrabold text-base py-3.5 rounded-2xl shadow-md cursor-pointer
                      transition-all duration-150"
                 >
-                    Siap Bermain! 🚀
+                    Siap Bermain! <Sparkles className="w-5 h-5" />
                 </button>
             </div>
         </div>

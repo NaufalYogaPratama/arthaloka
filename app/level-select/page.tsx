@@ -5,11 +5,11 @@ import { motion } from "framer-motion";
 import LevelCard from "@/components/ui/LevelCard";
 import { useGameStore } from "@/store/gameStore";
 import type { GameLevel } from "@/types/game";
+import { Target, ArrowLeft } from 'lucide-react';
 
 const levels = [
     {
         key: "easy" as const,
-        emoji: "🌱",
         title: "Easy",
         topics: "Budgeting · Menabung · Kebutuhan vs Keinginan",
         description:
@@ -18,7 +18,6 @@ const levels = [
     },
     {
         key: "medium" as const,
-        emoji: "🌊",
         title: "Medium",
         topics: "Impulsive Buying · Hutang · Pay Later",
         description:
@@ -27,7 +26,6 @@ const levels = [
     },
     {
         key: "hard" as const,
-        emoji: "🔥",
         title: "Hard",
         topics: "Pinjol · Investasi · Risk Management",
         description:
@@ -77,8 +75,8 @@ export default function LevelSelectPage() {
                     <h1 className="font-fredoka text-4xl md:text-5xl font-bold text-green-700 mb-3">
                         Pilih Level
                     </h1>
-                    <p className="text-gray-500 text-lg">
-                        Sesuaikan tantangan dengan kemampuanmu! 🎯
+                    <p className="text-gray-600 text-lg flex items-center justify-center gap-2">
+                        Sesuaikan tantangan dengan kemampuanmu! <Target className="w-6 h-6 text-amber-500" />
                     </p>
                 </motion.div>
 
@@ -108,9 +106,9 @@ export default function LevelSelectPage() {
                 >
                     <button
                         onClick={() => router.push("/")}
-                        className="text-gray-400 hover:text-gray-600 font-medium text-sm transition-colors"
+                        className="text-gray-400 hover:text-gray-600 font-medium text-sm transition-colors flex items-center justify-center gap-1 mx-auto"
                     >
-                        ← Kembali ke Menu Utama
+                        <ArrowLeft className="w-4 h-4" /> Kembali ke Menu Utama
                     </button>
                 </motion.div>
             </div>

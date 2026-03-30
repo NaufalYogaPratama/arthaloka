@@ -4,6 +4,7 @@ import Image from 'next/image'
 import AppLogo from '@/components/ui/AppLogo'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { Sprout, UserRound, Gamepad2, BookOpen, Trophy, Leaf } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -26,23 +27,21 @@ export default function LoginPage() {
       <div className="absolute bottom-[25%] left-[15%] w-5 h-5 rounded-full bg-emerald-300/50 animate-pulse delay-1000 z-0" />
       <div className="absolute top-[50%] right-[15%] w-3 h-3 rounded-full bg-lime-400/50 animate-pulse delay-700 z-0" />
 
-      {/* Floating leaf emojis */}
+      {/* Floating leaf icons */}
       <div className="absolute top-[10%] right-[30%] text-3xl animate-bounce opacity-30 z-0">
-        🌿
+        <Leaf className="w-8 h-8 text-green-400" />
       </div>
       <div className="absolute bottom-[15%] right-[20%] text-2xl animate-bounce delay-300 opacity-30 z-0">
-        🍃
+        <Leaf className="w-6 h-6 text-emerald-400 rotate-45" />
       </div>
       <div className="absolute top-[40%] left-[8%] text-2xl animate-bounce delay-700 opacity-25 z-0">
-        🌱
+        <Sprout className="w-6 h-6 text-green-600" />
       </div>
 
       {/* Content section */}
-      
+
       <div className="relative z-10 min-h-screen w-full flex flex-col bg-gradient-to-b from-green-50/70 via-emerald-50/50 to-blue-50/70 px-5 py-8 gap-5 items-center justify-center">
         {/* Ilustrasi "main sambil belajar" */}
-        {/* Original: 995×865 → ratio 1.151 */}
-        {/* Display height 150px → width = 150 * (995/865) = 173px */}
 
         {/* Login card */}
         <div className="relative bg-white rounded-3xl shadow-xl border border-gray-100 p-7 pt-8 w-full max-w-[360px] overflow-hidden">
@@ -92,6 +91,7 @@ export default function LoginPage() {
             onClick={handleGuest}
             className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 active:scale-[0.98] text-white font-extrabold text-base rounded-2xl py-3.5 transition-all duration-150 shadow-md"
           >
+            <UserRound className="w-5 h-5" />
             Bermain sebagai Guest
           </button>
 

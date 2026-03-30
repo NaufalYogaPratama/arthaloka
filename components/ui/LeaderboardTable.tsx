@@ -1,6 +1,7 @@
 import type React from "react";
 import Image from "next/image";
 import { getMedalIcon } from "@/lib/assets";
+import { Trophy } from 'lucide-react'
 
 export type LeaderboardRow = {
     rank: number;
@@ -29,8 +30,8 @@ export default function LeaderboardTable({
     return (
         <div className="overflow-hidden rounded-2xl border border-white/50 bg-white/70 backdrop-blur-xl shadow-sm">
             <div className="px-4 py-3 border-b border-white/50 flex items-center justify-between">
-                <h2 className="font-fredoka text-lg font-bold text-gray-800">
-                    🏆 Leaderboard
+                <h2 className="font-fredoka text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-amber-500" /> Leaderboard
                 </h2>
                 <p className="text-xs text-gray-500">
                     Top {Math.min(10, rows.length)} pemain

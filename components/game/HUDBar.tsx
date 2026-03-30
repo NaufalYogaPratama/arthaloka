@@ -1,10 +1,11 @@
 'use client'
 
-import Image from 'next/image'
+import { Heart, Zap, MapPin, HelpCircle } from 'lucide-react'
 import { getComboBadgeAsset } from '@/lib/assets'
+import Image from 'next/image'
 
 interface HUDBarProps {
-    lives: number      // 0, 1, 2, atau 3
+    lives: number
     score: number
     combo: number
     roundNum: number
@@ -13,69 +14,73 @@ interface HUDBarProps {
 
 export default function HUDBar({ lives, score, combo, roundNum, questionIdx }: HUDBarProps) {
     const comboBadge = getComboBadgeAsset(combo)
-    const comboDisplayH = 30
+    const comboDisplayH = 28
     const comboDisplayW = comboBadge
         ? Math.round(comboDisplayH * (comboBadge.width / comboBadge.height))
         : 0
 
     return (
-        <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm
-                    border-b border-gray-100 shadow-sm">
+        <div className="sticky top-0 z-20 bg-white border-b border-gray-100"
+            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
 
-            {/* Main HUD Row */}
-            <div className="flex items-center justify-between px-4 py-2.5">
+            {/* ── MAIN HUD ROW ── */}
+            <div className="grid grid-cols-3 items-center px-4 py-2.5">
 
-                {/* LEFT: 3 Hearts Individual */}
-                <div className="flex flex-col items-start gap-0.5">
+                {/* LEFT: 3 Hearts */}
+                <div className="flex flex-col gap-0.5">
                     <div className="flex items-center gap-1.5">
-                        {[1, 2, 3].map((heartNum) => {
-                            const isAlive = heartNum <= lives
-                            const isLast = lives === 1 && heartNum === 1
+                        {[1, 2, 3].map((n) => {
+                            const alive = n <= lives
+                            const danger = lives === 1 && n === 1
                             return (
-                                <span
-                                    key={heartNum}
+                                <Heart
+                                    key={n}
                                     className={[
-                                        'text-[28px] leading-none select-none',
-                                        'transition-all duration-300',
-                                        isAlive ? 'opacity-100' : 'opacity-20 grayscale',
-                                        isLast ? 'animate-pulse drop-shadow-[0_0_6px_rgba(239,68,68,0.8)]' : '',
+                                        'w-6 h-6 transition-all duration-300',
+                                        alive
+                                            ? 'fill-red-500 text-red-500'
+                                            : 'fill-gray-200 text-gray-200',
+                                        danger ? 'animate-pulse' : '',
                                     ].join(' ')}
-                                >
-                                    ❤️
-                                </span>
+                                />
                             )
                         })}
                     </div>
-                    <span className="text-[9px] text-gray-400 font-bold pl-0.5">
+                    <span className="text-[9px] text-gray-400 font-bold tracking-wide pl-0.5">
                         {lives}/3 nyawa
                     </span>
                 </div>
 
-                {/* CENTER: Score */}
+                {/* CENTER: Score — tetap center tapi lebih compact */}
                 <div className="text-center">
-                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-0.5">
+                    <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">
                         SKOR
                     </p>
-                    <p className="text-2xl font-black text-amber-500 leading-none"
-                        style={{ fontFamily: "'Fredoka One', cursive" }}>
+                    <p
+                        className="text-2xl font-black text-amber-500 leading-none tabular-nums"
+                        style={{ fontFamily: "'Fredoka One', cursive" }}
+                    >
                         {score.toLocaleString('id-ID')}
                     </p>
                 </div>
 
-                {/* RIGHT: Round + Question */}
-                <div className="text-right">
-                    <p className="text-[11px] text-gray-600 font-bold">
-                        Jalan {roundNum + 1}/5
-                    </p>
-                    <p className="text-[11px] text-gray-600 font-bold">
-                        Soal {Math.min(questionIdx + 1, 10)}/10
-                    </p>
+                {/* RIGHT: Progress info — aligned kanan */}
+                <div className="flex flex-col items-end gap-0.5">
+                    <div className="flex items-center gap-1 text-gray-500">
+                        <MapPin className="w-3 h-3" />
+                        <span className="text-[11px] font-bold">Jalan {roundNum}/5</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-gray-500">
+                        <HelpCircle className="w-3 h-3" />
+                        <span className="text-[11px] font-bold">Soal {Math.min(questionIdx + 1, 10)}/10</span>
+                    </div>
                 </div>
             </div>
 
-            {/* Combo Badge Row */}
+            {/* ── COMBO ROW — hanya muncul jika combo >= 2 ── */}
             {comboBadge && combo >= 2 && (
-                <div className="flex justify-center pb-1.5">
+                <div className="flex justify-center items-center gap-2 pb-2">
+                    <Zap className="w-3.5 h-3.5 text-amber-500" />
                     <Image
                         src={comboBadge.src}
                         alt={`${combo}x combo`}

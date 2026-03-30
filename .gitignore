@@ -6,6 +6,8 @@
 .pnp.js
 .yarn/install-state.gz
 
+.gitignore
+
 # testing
 /coverage
 
@@ -42,3 +44,7 @@ ArthaLoka_Prompt_Batch1.md
 ArthaLoka_Prompt_Batch2.md
 ArthaLoka_Prompt_Batch3.md
 ArthaLoka_Prompt_Batch4_5.md
+
+ArthaLoka_Detailing_Phase1_2.md
+ArthaLoka_Detailing_Phase3_4.md
+ArthaLoka_Detailing_Phase5.md

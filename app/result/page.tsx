@@ -12,6 +12,17 @@ import LeaderboardTable, {
 import AppLogo from "@/components/ui/AppLogo";
 import Image from "next/image";
 import { NEW_RECORD_BANNER, PERFECT_CLEAR_BANNER, VICTORY_ILLUSTRATION } from "@/lib/assets";
+import {
+    Target,
+    Trophy,
+    Heart,
+    MessageCircle,
+    Share2,
+    Copy,
+    GraduationCap,
+    RotateCcw,
+    ArrowLeft
+} from 'lucide-react'
 
 type RecordResponse = {
     isNewRecord: boolean;
@@ -148,7 +159,7 @@ export default function ResultPage() {
     }, [currentUserId, level, livesRemaining, maxCombo, phase, questionIdx, score]);
 
     const shareText = useMemo(() => {
-        return `Saya dapat ${totalScore} poin di ArthaLoka level ${levelLabel}! 🎯 #ArthaLoka #LiterasiKeuangan`;
+        return `Saya dapat ${totalScore} poin di ArthaLoka level ${levelLabel}! #ArthaLoka #LiterasiKeuangan`;
     }, [levelLabel, totalScore]);
 
     const shareUrl = useMemo(() => {
@@ -194,7 +205,7 @@ export default function ResultPage() {
                 <div className="absolute z-0 top-[-60px] left-[-40px] w-[200px] h-[200px] rounded-full bg-green-200/30 blur-2xl" />
                 <div className="absolute z-0 bottom-[-60px] right-[-40px] w-[220px] h-[220px] rounded-full bg-teal-200/25 blur-3xl" />
                 <div className="bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl p-8 max-w-md text-center relative z-10">
-                    <div className="text-6xl mb-3">🎯</div>
+                    <Target className="w-16 h-16 text-amber-500 mx-auto mb-3" />
                     <h1 className="font-fredoka text-2xl font-bold text-gray-800 mb-2">
                         Hasil belum siap
                     </h1>
@@ -203,10 +214,10 @@ export default function ResultPage() {
                         skor dan leaderboard.
                     </p>
                     <button
-                        className="w-full py-3 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold shadow-lg shadow-green-500/25 hover:shadow-xl transition-all active:scale-[0.98]"
+                        className="w-full py-3 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold shadow-lg shadow-green-500/25 hover:shadow-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                         onClick={() => router.push("/level-select")}
                     >
-                        ← Kembali pilih level
+                        <ArrowLeft className="w-4 h-4" /> Kembali pilih level
                     </button>
                 </div>
             </main>
@@ -222,7 +233,7 @@ export default function ResultPage() {
             <div className="relative z-10 max-w-4xl mx-auto px-4 py-10 md:py-14 w-full">
                 <div className="flex flex-col items-center text-center">
                     <div className="flex items-center gap-2 mb-4">
-                        <span className="text-3xl">🏆</span>
+                        <Trophy className="w-8 h-8 text-amber-500" />
                         <h1 className="font-fredoka text-3xl md:text-4xl font-bold text-gray-800">
                             Hasil Permainan
                         </h1>
@@ -314,9 +325,7 @@ export default function ResultPage() {
                             >
                                 {totalScore}
                             </span>
-                            <span className="text-xl md:text-2xl text-amber-400 font-fredoka font-bold">
-                                🎯
-                            </span>
+                            <Target className="w-6 h-6 text-amber-400" />
                         </div>
                     </div>
 
@@ -342,8 +351,8 @@ export default function ResultPage() {
                             <p className="text-xs text-gray-500 font-semibold">
                                 Nyawa Sisa
                             </p>
-                            <p className="font-fredoka text-xl font-bold text-gray-800">
-                                {livesRemaining} ❤️
+                            <p className="font-fredoka text-xl font-bold text-gray-800 flex items-center justify-center gap-1.5">
+                                {livesRemaining} <Heart className="w-5 h-5 fill-red-500 text-red-500" />
                             </p>
                         </div>
                     </div>
@@ -371,22 +380,22 @@ export default function ResultPage() {
                         </h2>
                         <div className="flex flex-col sm:flex-row gap-3">
                             <button
-                                className="flex-1 py-3 rounded-2xl bg-green-500/90 hover:bg-green-500 text-white font-bold shadow-lg shadow-green-500/20 transition-all active:scale-[0.98]"
+                                className="flex-1 py-3 rounded-2xl bg-green-500/90 hover:bg-green-500 text-white font-bold shadow-lg shadow-green-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                                 onClick={handleShareWhatsApp}
                             >
-                                WhatsApp
+                                <MessageCircle className="w-4 h-4" /> WhatsApp
                             </button>
                             <button
-                                className="flex-1 py-3 rounded-2xl bg-sky-500/90 hover:bg-sky-500 text-white font-bold shadow-lg shadow-sky-500/20 transition-all active:scale-[0.98]"
+                                className="flex-1 py-3 rounded-2xl bg-sky-500/90 hover:bg-sky-500 text-white font-bold shadow-lg shadow-sky-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                                 onClick={handleShareTwitter}
                             >
-                                Twitter/X
+                                <Share2 className="w-4 h-4" /> Twitter/X
                             </button>
                             <button
-                                className="flex-1 py-3 rounded-2xl bg-white border-2 border-gray-200 text-gray-700 font-bold hover:border-amber-300 transition-all active:scale-[0.98]"
+                                className="flex-1 py-3 rounded-2xl bg-white border-2 border-gray-200 text-gray-700 font-bold hover:border-amber-300 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                                 onClick={handleCopyLink}
                             >
-                                {copied ? "Link Disalin!" : "Copy Link"}
+                                <Copy className="w-4 h-4" /> {copied ? "Link Disalin!" : "Copy Link"}
                             </button>
                         </div>
                     </div>
@@ -395,16 +404,16 @@ export default function ResultPage() {
                 {/* Actions */}
                 <section className="flex flex-col sm:flex-row gap-3">
                     <button
-                        className="flex-1 py-3.5 rounded-2xl bg-white border-2 border-gray-200 text-gray-700 font-bold hover:border-green-400 transition-all active:scale-[0.98]"
+                        className="flex-1 py-3.5 rounded-2xl bg-white border-2 border-gray-200 text-gray-700 font-bold hover:border-green-400 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                         onClick={() => router.push("/learn")}
                     >
-                        📚 Ruang Belajar
+                        <GraduationCap className="w-4 h-4" /> Ruang Belajar
                     </button>
                     <button
-                        className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 text-white font-bold shadow-lg shadow-amber-500/20 hover:shadow-xl transition-all active:scale-[0.98]"
+                        className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 text-white font-bold shadow-lg shadow-amber-500/20 hover:shadow-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                         onClick={handleMainAgain}
                     >
-                        🔄 Main Lagi
+                        <RotateCcw className="w-4 h-4" /> Main Lagi
                     </button>
                 </section>
 
@@ -415,4 +424,3 @@ export default function ResultPage() {
         </main>
     );
 }
-

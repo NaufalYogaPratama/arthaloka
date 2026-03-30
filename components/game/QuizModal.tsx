@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { QUIZ_BADGE } from "@/lib/assets";
+import { CheckCircle2, XCircle } from "lucide-react";
 
 interface QuizModalProps {
     question: {
@@ -90,11 +91,11 @@ export default function QuizModal({
         if (result === null) return null;
 
         if (index === result.correctIndex) {
-            return <span className="text-green-600 text-lg">✅</span>;
+            return <CheckCircle2 className="w-5 h-5 text-green-600" />;
         }
 
         if (index === selectedIndex && !result.correct) {
-            return <span className="text-red-600 text-lg">❌</span>;
+            return <XCircle className="w-5 h-5 text-red-500" />;
         }
 
         return null;
@@ -181,8 +182,8 @@ export default function QuizModal({
                             }`}
                     >
                         {result.correct
-                            ? "🎉 Benar! Keren!"
-                            : "😞 Salah! Coba lagi nanti ya..."}
+                            ? "Benar! Keren!"
+                            : "Salah! Coba lagi nanti ya..."}
                     </motion.div>
                 )}
             </motion.div>

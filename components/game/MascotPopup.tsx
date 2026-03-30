@@ -2,17 +2,18 @@
 
 import { MascotImage } from '@/components/ui/MascotImage'
 import type { MascotVariant } from '@/types/game'
+import { Sparkles, AlertTriangle, ChevronRight } from 'lucide-react'
 
 const MESSAGES: Record<string, string[]> = {
     wrong1: [
-        'Ayo, kamu pasti bisa! Pikirkan lagi ya! 💪',
-        'Hampir benar kok! Tetap semangat! 🌟',
-        'Jangan menyerah! Masih ada harapan! 😊',
+        'Ayo, kamu pasti bisa! Pikirkan lagi ya!',
+        'Hampir benar kok! Tetap semangat!',
+        'Jangan menyerah! Masih ada harapan!',
     ],
     wrong2: [
-        'Hati-hati! Nyawa tinggal 1! ⚠️',
-        'Satu nyawa lagi! Pikirkan baik-baik! 🙏',
-        'Kita bisa! Jangan sampai salah lagi! 💚',
+        'Hati-hati! Nyawa tinggal 1!',
+        'Satu nyawa lagi! Pikirkan baik-baik!',
+        'Kita bisa! Jangan sampai salah lagi!',
     ],
     gameover: [
         "It's okay, you did your best!",
@@ -74,7 +75,9 @@ export function MascotPopup({ type, onClose, message }: MascotPopupProps) {
                     <p className="text-sm text-gray-500 mb-6">Nyawa berkurang 1. Masih semangat!</p>
                 )}
                 {type === 'wrong2' && (
-                    <p className="text-sm text-red-500 font-semibold mb-6">⚠️ Nyawa tinggal 1!</p>
+                    <p className="text-sm text-red-500 font-semibold mb-6 flex items-center justify-center gap-1">
+                        <AlertTriangle className="w-4 h-4" /> Nyawa tinggal 1!
+                    </p>
                 )}
 
                 {/* CTA Button — hanya untuk wrong1 & wrong2 */}
@@ -83,9 +86,9 @@ export function MascotPopup({ type, onClose, message }: MascotPopupProps) {
                         onClick={onClose}
                         className="bg-green-500 hover:bg-green-600 active:scale-95
                        text-white font-extrabold text-base py-3 px-10
-                       rounded-2xl transition-all duration-150"
+                       rounded-2xl transition-all duration-150 flex items-center gap-1 mx-auto"
                     >
-                        Lanjut →
+                        Lanjut <ChevronRight className="w-5 h-5" />
                     </button>
                 )}
             </div>

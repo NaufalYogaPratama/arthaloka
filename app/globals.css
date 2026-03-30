@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -25,7 +27,7 @@ body {
 }
 
 .font-fredoka {
-  font-family: var(--font-fredoka), "Fredoka", cursive;
+  font-family: 'Fredoka One', cursive;
 }
 
 @keyframes popIn {
