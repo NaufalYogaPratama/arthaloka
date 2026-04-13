@@ -1,7 +1,7 @@
 # ArthaLoka
 
 <p align="center">
-  <img src="/assets/logo-horizontal.png" alt="ArthaLoka Logo" width="400">
+  <img src="/public/assets/logo.png" alt="ArthaLoka Logo" width="400">
 </p>
 
 <p align="center">
