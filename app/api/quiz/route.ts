@@ -17,24 +17,13 @@ export async function GET(request: NextRequest) {
 
         const level = levelParam.toUpperCase() as "EASY" | "MEDIUM" | "HARD";
 
-        // Fetch 10 random questions for the level
-        // Using raw query for random ordering (Prisma doesn't support ORDER BY RANDOM natively)
-        const questions = await prisma.$queryRaw<
-            Array<{
-                id: string;
-                questionText: string;
-                options: string[];
-            }>
-        >`
-            SELECT id, "questionText", options
-            FROM "Question"
-            WHERE level = ${level}::"Level"
-            ORDER BY RANDOM()
-            LIMIT 10
-        `;
+        const questions = await prisma.question.findMany({
+            where: { level },
+        });
 
-        // SECURITY: correctIndex is NOT included in the SELECT — never sent to client
-        return NextResponse.json(questions);
+        const safeQuestions = questions.map(({ correctIndex, ...safe }) => safe);
+
+        return NextResponse.json(safeQuestions);
     } catch (error) {
         console.error("Quiz fetch error:", error);
         return NextResponse.json(

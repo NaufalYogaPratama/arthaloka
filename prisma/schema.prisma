@@ -22,12 +22,14 @@ model User {
 }
 
 model Question {
-  id              String @id @default(uuid())
-  level           Level
+  id              String   @id @default(uuid())
+  level           Level    // EASY | MEDIUM | HARD
+  subBab          Int      // 0=Pendahuluan, 1=Dana Darurat, 2=Konsumsi,
+                           // 3=Arus Kas, 4=Inflasi, 5=Psikologi, 6=Pinjol
   questionText    String
-  options         Json   // String[] — 4 options
-  correctIndex    Int    // NEVER sent to client
-  educationalFact String // shown in Ruang Belajar
+  options         Json     // String[] — 3 pilihan (A, B, C)
+  correctIndex    Int      // 0=A, 1=B, 2=C
+  educationalFact String   // Fun fact dari dokumen fun facts
 }
 
 model GameSession {
