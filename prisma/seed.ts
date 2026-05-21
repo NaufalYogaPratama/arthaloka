@@ -133,7 +133,7 @@ const questions = [
             "C. Untuk membeli barang diskon saat program flash sale"
         ],
         "correctIndex": 1,
-        "educationalFact": "Tahukah kamu? Dana darurat (emergency fund) sama sekali berbeda dengan tabungan biasa atau investasi. Fenomena nyata di masyarakat menunjukkan banyak orang menyamakan ketiganya, padahal dana darurat memiliki fungsi tunggal yang sakral: sebagai bemper atau jaring pengaman ketika terjadi musibah tak terduga,"
+        "educationalFact": "Tahukah kamu? Dana darurat (emergency fund) berbeda dengan tabungan biasa. Dana darurat memiliki fungsi sakral: sebagai bemper saat terjadi musibah tak terduga, seperti pemutusan hubungan kerja (PHK) atau biaya perbaikan kendaraan akibat kecelakaan."
     },
     {
         "level": "EASY",
@@ -145,7 +145,7 @@ const questions = [
             "C. Di dalam celengan target di rumah"
         ],
         "correctIndex": 0,
-        "educationalFact": "seperti pemutusan hubungan kerja (PHK) seketika atau biaya perbaikan kendaraan akibat kecelakaan. Tahukah kalian? Dana darurat tidak boleh diinvestasikan ke dalam instrumen yang fluktuatif atau berisiko tinggi seperti saham gorengan atau kripto. Pengetahuan mendasar menetapkan bahwa dana darurat wajib disimpan di tempat yang aman dan sangat mudah diakses, agar ketika kondisi kritis melanda di jam dua pagi, uang tersebut bisa langsung dicairkan tanpa drama penurunan nilai modal. Fakta menarik! Seseorang yang tidak memiliki kesiapan dana darurat terbukti secara psikologis lebih rentan terjebak dalam lingkaran setan finansial. Saat terjadi musibah kecil, mereka terpaksa mengambil keputusan jangka pendek yang merusak, seperti menjual aset produktif dengan harga murah (loss sale) atau beralih menggunakan instrumen utang berbunga tinggi demi menutup kebutuhan darurat tersebut. Fun fact! Aturan praktis yang paling umum digunakan oleh masyarakat umum untuk menentukan jumlah dana darurat minimal bagi seorang individu yang masih lajang/belum menikah adalah sebesar 3 kali pengeluaran bulanan. Jadi, jika pengeluaran riil harian dan bulananmu berjumlah Rp"
+        "educationalFact": "Tahukah kalian? Dana darurat tidak boleh diinvestasikan ke dalam instrumen berisiko tinggi seperti saham gorengan atau kripto. Dana darurat wajib disimpan di tempat yang aman dan mudah diakses, agar bisa langsung dicairkan tanpa drama saat kondisi kritis."
     },
     {
         "level": "EASY",
@@ -157,7 +157,7 @@ const questions = [
             "C. Rp30.000.000 (10 kali pengeluaran)"
         ],
         "correctIndex": 1,
-        "educationalFact": "Tahukah kamu? Dana darurat (emergency fund) sama sekali berbeda dengan tabungan biasa atau investasi. Fenomena nyata di masyarakat menunjukkan banyak orang menyamakan ketiganya, padahal dana darurat memiliki fungsi tunggal yang sakral: sebagai bemper atau jaring pengaman ketika terjadi musibah tak terduga,"
+        "educationalFact": "Fakta menarik! Seseorang yang tidak memiliki dana darurat terbukti lebih rentan terjebak dalam lingkaran setan finansial. Saat musibah kecil datang, mereka terpaksa mengambil utang berbunga tinggi demi menutup kebutuhan darurat tersebut."
     },
     {
         "level": "EASY",
@@ -169,7 +169,7 @@ const questions = [
             "C. Biaya penggantian ban mobil yang bocor saat perjalanan mudik"
         ],
         "correctIndex": 2,
-        "educationalFact": "seperti pemutusan hubungan kerja (PHK) seketika atau biaya perbaikan kendaraan akibat kecelakaan. Tahukah kalian? Dana darurat tidak boleh diinvestasikan ke dalam instrumen yang fluktuatif atau berisiko tinggi seperti saham gorengan atau kripto. Pengetahuan mendasar menetapkan bahwa dana darurat wajib disimpan di tempat yang aman dan sangat mudah diakses, agar ketika kondisi kritis melanda di jam dua pagi, uang tersebut bisa langsung dicairkan tanpa drama penurunan nilai modal. Fakta menarik! Seseorang yang tidak memiliki kesiapan dana darurat terbukti secara psikologis lebih rentan terjebak dalam lingkaran setan finansial. Saat terjadi musibah kecil, mereka terpaksa mengambil keputusan jangka pendek yang merusak, seperti menjual aset produktif dengan harga murah (loss sale) atau beralih menggunakan instrumen utang berbunga tinggi demi menutup kebutuhan darurat tersebut. Fun fact! Aturan praktis yang paling umum digunakan oleh masyarakat umum untuk menentukan jumlah dana darurat minimal bagi seorang individu yang masih lajang/belum menikah adalah sebesar 3 kali pengeluaran bulanan. Jadi, jika pengeluaran riil harian dan bulananmu berjumlah Rp"
+        "educationalFact": "Fun fact! Aturan praktis yang paling umum digunakan untuk menentukan jumlah dana darurat minimal bagi seorang individu yang masih lajang atau belum menikah adalah sebesar 3 hingga 6 kali pengeluaran bulanan."
     },
     {
         "level": "EASY",
@@ -181,7 +181,7 @@ const questions = [
             "C. Saham hanya diperuntukkan bagi perusahaan besar"
         ],
         "correctIndex": 0,
-        "educationalFact": "Tahukah kamu? Dana darurat (emergency fund) sama sekali berbeda dengan tabungan biasa atau investasi. Fenomena nyata di masyarakat menunjukkan banyak orang menyamakan ketiganya, padahal dana darurat memiliki fungsi tunggal yang sakral: sebagai bemper atau jaring pengaman ketika terjadi musibah tak terduga,"
+        "educationalFact": "Money fact! Jika sebagian dana daruratmu terpakai untuk keperluan mendesak, prioritas keuanganmu bulan depan adalah mengisi ulang dana tersebut kembali ke target minimal yang ditetapkan."
     },
     {
         "level": "EASY",
@@ -193,7 +193,7 @@ const questions = [
             "C. Saat kondisi ekonomi negara sedang mengalami krisis besar"
         ],
         "correctIndex": 1,
-        "educationalFact": "seperti pemutusan hubungan kerja (PHK) seketika atau biaya perbaikan kendaraan akibat kecelakaan. Tahukah kalian? Dana darurat tidak boleh diinvestasikan ke dalam instrumen yang fluktuatif atau berisiko tinggi seperti saham gorengan atau kripto. Pengetahuan mendasar menetapkan bahwa dana darurat wajib disimpan di tempat yang aman dan sangat mudah diakses, agar ketika kondisi kritis melanda di jam dua pagi, uang tersebut bisa langsung dicairkan tanpa drama penurunan nilai modal. Fakta menarik! Seseorang yang tidak memiliki kesiapan dana darurat terbukti secara psikologis lebih rentan terjebak dalam lingkaran setan finansial. Saat terjadi musibah kecil, mereka terpaksa mengambil keputusan jangka pendek yang merusak, seperti menjual aset produktif dengan harga murah (loss sale) atau beralih menggunakan instrumen utang berbunga tinggi demi menutup kebutuhan darurat tersebut. Fun fact! Aturan praktis yang paling umum digunakan oleh masyarakat umum untuk menentukan jumlah dana darurat minimal bagi seorang individu yang masih lajang/belum menikah adalah sebesar 3 kali pengeluaran bulanan. Jadi, jika pengeluaran riil harian dan bulananmu berjumlah Rp"
+        "educationalFact": "Tahukah kamu? Dana darurat (emergency fund) berbeda dengan tabungan biasa. Dana darurat memiliki fungsi sakral: sebagai bemper saat terjadi musibah tak terduga, seperti pemutusan hubungan kerja (PHK) atau biaya perbaikan kendaraan akibat kecelakaan."
     },
     {
         "level": "EASY",
@@ -205,7 +205,7 @@ const questions = [
             "C. Rentan terjerat utang konsumtif atau pinjol ilegal saat ada musibah"
         ],
         "correctIndex": 2,
-        "educationalFact": "Tahukah kamu? Dana darurat (emergency fund) sama sekali berbeda dengan tabungan biasa atau investasi. Fenomena nyata di masyarakat menunjukkan banyak orang menyamakan ketiganya, padahal dana darurat memiliki fungsi tunggal yang sakral: sebagai bemper atau jaring pengaman ketika terjadi musibah tak terduga,"
+        "educationalFact": "Tahukah kalian? Dana darurat tidak boleh diinvestasikan ke dalam instrumen berisiko tinggi seperti saham gorengan atau kripto. Dana darurat wajib disimpan di tempat yang aman dan mudah diakses, agar bisa langsung dicairkan tanpa drama saat kondisi kritis."
     },
     {
         "level": "EASY",
@@ -217,7 +217,7 @@ const questions = [
             "C. Cukup menggunakan uang sisa di akhir bulan saja"
         ],
         "correctIndex": 0,
-        "educationalFact": "seperti pemutusan hubungan kerja (PHK) seketika atau biaya perbaikan kendaraan akibat kecelakaan. Tahukah kalian? Dana darurat tidak boleh diinvestasikan ke dalam instrumen yang fluktuatif atau berisiko tinggi seperti saham gorengan atau kripto. Pengetahuan mendasar menetapkan bahwa dana darurat wajib disimpan di tempat yang aman dan sangat mudah diakses, agar ketika kondisi kritis melanda di jam dua pagi, uang tersebut bisa langsung dicairkan tanpa drama penurunan nilai modal. Fakta menarik! Seseorang yang tidak memiliki kesiapan dana darurat terbukti secara psikologis lebih rentan terjebak dalam lingkaran setan finansial. Saat terjadi musibah kecil, mereka terpaksa mengambil keputusan jangka pendek yang merusak, seperti menjual aset produktif dengan harga murah (loss sale) atau beralih menggunakan instrumen utang berbunga tinggi demi menutup kebutuhan darurat tersebut. Fun fact! Aturan praktis yang paling umum digunakan oleh masyarakat umum untuk menentukan jumlah dana darurat minimal bagi seorang individu yang masih lajang/belum menikah adalah sebesar 3 kali pengeluaran bulanan. Jadi, jika pengeluaran riil harian dan bulananmu berjumlah Rp"
+        "educationalFact": "Fakta menarik! Seseorang yang tidak memiliki dana darurat terbukti lebih rentan terjebak dalam lingkaran setan finansial. Saat musibah kecil datang, mereka terpaksa mengambil utang berbunga tinggi demi menutup kebutuhan darurat tersebut."
     },
     {
         "level": "EASY",
@@ -229,7 +229,7 @@ const questions = [
             "C. Karena aturan perbankan mengharuskan demikian"
         ],
         "correctIndex": 1,
-        "educationalFact": "Tahukah kamu? Dana darurat (emergency fund) sama sekali berbeda dengan tabungan biasa atau investasi. Fenomena nyata di masyarakat menunjukkan banyak orang menyamakan ketiganya, padahal dana darurat memiliki fungsi tunggal yang sakral: sebagai bemper atau jaring pengaman ketika terjadi musibah tak terduga,"
+        "educationalFact": "Fun fact! Aturan praktis yang paling umum digunakan untuk menentukan jumlah dana darurat minimal bagi seorang individu yang masih lajang atau belum menikah adalah sebesar 3 hingga 6 kali pengeluaran bulanan."
     },
     {
         "level": "EASY",
@@ -241,7 +241,7 @@ const questions = [
             "C. Menyusun kembali strategi bulanan untuk mengisi ulang dana darurat tersebut hingga penuh"
         ],
         "correctIndex": 2,
-        "educationalFact": "seperti pemutusan hubungan kerja (PHK) seketika atau biaya perbaikan kendaraan akibat kecelakaan. Tahukah kalian? Dana darurat tidak boleh diinvestasikan ke dalam instrumen yang fluktuatif atau berisiko tinggi seperti saham gorengan atau kripto. Pengetahuan mendasar menetapkan bahwa dana darurat wajib disimpan di tempat yang aman dan sangat mudah diakses, agar ketika kondisi kritis melanda di jam dua pagi, uang tersebut bisa langsung dicairkan tanpa drama penurunan nilai modal. Fakta menarik! Seseorang yang tidak memiliki kesiapan dana darurat terbukti secara psikologis lebih rentan terjebak dalam lingkaran setan finansial. Saat terjadi musibah kecil, mereka terpaksa mengambil keputusan jangka pendek yang merusak, seperti menjual aset produktif dengan harga murah (loss sale) atau beralih menggunakan instrumen utang berbunga tinggi demi menutup kebutuhan darurat tersebut. Fun fact! Aturan praktis yang paling umum digunakan oleh masyarakat umum untuk menentukan jumlah dana darurat minimal bagi seorang individu yang masih lajang/belum menikah adalah sebesar 3 kali pengeluaran bulanan. Jadi, jika pengeluaran riil harian dan bulananmu berjumlah Rp"
+        "educationalFact": "Money fact! Jika sebagian dana daruratmu terpakai untuk keperluan mendesak, prioritas keuanganmu bulan depan adalah mengisi ulang dana tersebut kembali ke target minimal yang ditetapkan."
     },
     {
         "level": "EASY",

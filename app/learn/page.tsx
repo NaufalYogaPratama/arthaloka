@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { SwipeCard } from '@/components/ui/SwipeCard'
@@ -88,10 +88,21 @@ export default function LearnPage() {
     setIsTouch(typeof window !== 'undefined' && 'ontouchstart' in window)
   }, [])
 
-  // Fallback facts jika collectedFacts kosong (misal game over terlalu cepat)
-  const facts = collectedFacts.length > 0
-    ? collectedFacts.slice(0, 10)
-    : FALLBACK_FACTS[level]
+  // Ambil maksimal 2 fun facts secara acak.
+  // Gunakan useMemo agar hasil acak tidak berubah setiap kali komponen re-render (akibat timer countdown).
+  const facts = useMemo(() => {
+    const ALL_FACTS = collectedFacts.length > 0
+      ? collectedFacts
+      : FALLBACK_FACTS[level]
+
+    const pool = [...ALL_FACTS]
+    // Shuffle untuk variasi
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[pool[i], pool[j]] = [pool[j], pool[i]]
+    }
+    return pool.slice(0, 2)  // MAKSIMAL 2 SAJA
+  }, [collectedFacts, level])
   const remaining = facts.length - dismissed.length
 
   // State countdown
