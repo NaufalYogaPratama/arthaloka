@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { SwipeCard } from '@/components/ui/SwipeCard'
 import { MascotImage } from '@/components/ui/MascotImage'
+import { useCountdown } from '@/hooks/useCountdown'
 import { RUANG_BELAJAR_HERO, getTopicIconsForLevel } from '@/lib/assets'
 import { useGameStore } from '@/store/gameStore'
 import {
@@ -92,6 +93,19 @@ export default function LearnPage() {
     ? collectedFacts.slice(0, 10)
     : FALLBACK_FACTS[level]
   const remaining = facts.length - dismissed.length
+
+  // State countdown
+  const { secondsLeft, isDone, startCountdown, resetCountdown } = useCountdown(10)
+
+  // Mulai countdown otomatis saat kartu baru muncul di depan
+  // Gunakan useEffect yang watch `dismissed.length` (saat kartu berganti)
+  useEffect(() => {
+    if (facts.length > 0 && !showComplete) {
+      startCountdown()
+    }
+  }, [dismissed.length, showComplete, facts.length, startCountdown])
+
+  const isLocked = !isDone
 
   // Stack: tampilkan max 3 kartu dari atas tumpukan
   const activeStack = facts
@@ -238,7 +252,7 @@ export default function LearnPage() {
           </div>
 
           {/* Tombol skip ke complete screen */}
-          {!showComplete && facts.length > 0 && dismissed.length < facts.length && (
+          {!showComplete && facts.length > 0 && dismissed.length < facts.length && !isLocked && (
             <div className="flex justify-end pt-2">
               <button
                 onClick={() => setShowComplete(true)}
@@ -306,6 +320,7 @@ export default function LearnPage() {
                   stackIndex={stackIdx}
                   total={activeStack.length}
                   isActive={stackIdx === 0}
+                  isLocked={stackIdx === 0 && isLocked}
                   onSwipeLeft={() => handleSwipe('left')}
                   onSwipeRight={() => handleSwipe('right')}
                 >
@@ -371,20 +386,71 @@ export default function LearnPage() {
 
                     {/* Card footer */}
                     {stackIdx === 0 && (
-                      <div
-                        className="px-4 py-2.5 flex items-center justify-between"
-                        style={{ borderTop: `1px solid ${theme.border}` }}
-                      >
-                        <span className="text-[9px] text-gray-400 font-bold flex items-center gap-1">
-                          <ChevronLeft className="w-3 h-3" /> Skip
-                        </span>
-                        <span
-                          className="text-[9px] font-bold flex items-center gap-1"
-                          style={{ color: theme.accent }}
-                        >
-                          Paham <ChevronRight className="w-3 h-3" />
-                        </span>
-                      </div>
+                      <>
+                        {/* ── COUNTDOWN TIMER ── */}
+                        {isLocked && (
+                          <div
+                            className="px-5 py-3 flex items-center justify-center gap-3"
+                            style={{ borderTop: `1px solid ${theme.border}` }}
+                          >
+                            {/* Circular countdown visual */}
+                            <div className="relative w-10 h-10 flex-shrink-0">
+                              <svg className="w-10 h-10 -rotate-90" viewBox="0 0 40 40">
+                                {/* Track */}
+                                <circle
+                                  cx="20" cy="20" r="16"
+                                  fill="none"
+                                  stroke="rgba(0,0,0,0.08)"
+                                  strokeWidth="3"
+                                />
+                                {/* Progress — circumference = 2π×16 ≈ 100.5 */}
+                                <circle
+                                  cx="20" cy="20" r="16"
+                                  fill="none"
+                                  stroke={theme.accent}
+                                  strokeWidth="3"
+                                  strokeLinecap="round"
+                                  strokeDasharray="100.5"
+                                  strokeDashoffset={100.5 - (100.5 * (10 - secondsLeft) / 10)}
+                                  style={{ transition: 'stroke-dashoffset 1s linear' }}
+                                />
+                              </svg>
+                              {/* Angka di tengah */}
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span
+                                  className="text-sm font-black tabular-nums"
+                                  style={{ color: theme.accent, fontFamily: "'Fredoka One', cursive" }}
+                                >
+                                  {secondsLeft}
+                                </span>
+                              </div>
+                            </div>
+
+                            <p className="text-xs font-bold text-gray-400 text-center">
+                              Baca dulu ya...<br />
+                              <span style={{ color: theme.accent }}>tombol aktif dalam {secondsLeft} detik</span>
+                            </p>
+                          </div>
+                        )}
+
+                        {/* ── TOMBOL SWIPE (aktif setelah countdown) ── */}
+                        {!isLocked && (
+                          <div
+                            className="px-5 py-3 flex items-center justify-between"
+                            style={{ borderTop: `1px solid ${theme.border}` }}
+                          >
+                            <span className="text-[10px] text-gray-400 font-bold flex items-center gap-1">
+                              <ChevronLeft className="w-3 h-3" /> Geser kiri = skip
+                            </span>
+                            <span
+                              className="text-[10px] font-bold flex items-center gap-1"
+                              style={{ color: theme.accent }}
+                            >
+                              Geser kanan = paham <ChevronRight className="w-3 h-3" />
+                            </span>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 </SwipeCard>
@@ -403,25 +469,38 @@ export default function LearnPage() {
         )}
 
         {/* Bottom action buttons */}
-        <div className="px-4 pt-1 pb-[calc(0.5rem+env(safe-area-inset-bottom))] grid grid-cols-2 gap-2.5">
+        <div className="px-6 pb-6 grid grid-cols-2 gap-3">
           <button
-            onClick={() => handleSwipe('left')}
-            disabled={remaining === 0}
-            className="flex items-center justify-center gap-1.5 py-3 rounded-2xl
-                       font-bold text-sm text-gray-600 bg-white border border-gray-200
-                       shadow-sm transition-all active:scale-95 disabled:opacity-40"
+            onClick={() => !isLocked && handleSwipe('left')}
+            disabled={isLocked || remaining === 0}
+            className={[
+              'flex items-center justify-center gap-2 py-3 rounded-2xl',
+              'font-black text-sm bg-white border-2 border-gray-200',
+              'transition-all duration-300',
+              isLocked
+                ? 'opacity-35 cursor-not-allowed text-gray-300'
+                : 'text-gray-600 active:scale-95',
+            ].join(' ')}
           >
             <ChevronLeft className="w-4 h-4" />
             Skip
           </button>
+
           <button
-            onClick={() => handleSwipe('right')}
-            disabled={remaining === 0}
-            className="flex items-center justify-center gap-1.5 py-3 rounded-2xl
-                       font-bold text-sm text-white shadow-sm transition-all active:scale-95 disabled:opacity-40"
-            style={{ background: theme.accent }}
+            onClick={() => !isLocked && handleSwipe('right')}
+            disabled={isLocked || remaining === 0}
+            className={[
+              'flex items-center justify-center gap-2 py-3 rounded-2xl',
+              'font-black text-sm text-white transition-all duration-300',
+              isLocked ? 'opacity-35 cursor-not-allowed' : 'active:scale-95',
+            ].join(' ')}
+            style={{
+              background: isLocked
+                ? '#9ca3af'  // abu saat terkunci
+                : theme.accent,  // warna normal saat aktif
+            }}
           >
-            Paham
+            Paham!
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>

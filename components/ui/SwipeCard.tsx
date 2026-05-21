@@ -18,6 +18,7 @@ interface SwipeCardProps {
   total: number
   // Apakah ini kartu paling depan (interaktif)?
   isActive: boolean
+  isLocked?: boolean
 }
 
 const SWIPE_THRESHOLD = 80  // px minimal untuk trigger swipe
@@ -30,6 +31,7 @@ export function SwipeCard({
   stackIndex,
   total,
   isActive,
+  isLocked = false,
 }: SwipeCardProps) {
   const cardRef    = useRef<HTMLDivElement>(null)
   const [drag, setDrag]   = useState({ x: 0, y: 0, active: false })
@@ -68,23 +70,23 @@ export function SwipeCard({
 
   // ── POINTER EVENTS ──
   const handlePointerDown = useCallback((e: PointerEvent<HTMLDivElement>) => {
-    if (!isActive || exiting) return
+    if (!isActive || exiting || isLocked) return
     e.currentTarget.setPointerCapture(e.pointerId)
     startPos.current = { x: e.clientX, y: e.clientY }
     setDrag({ x: 0, y: 0, active: true })
-  }, [isActive, exiting])
+  }, [isActive, exiting, isLocked])
 
   const handlePointerMove = useCallback((e: PointerEvent<HTMLDivElement>) => {
-    if (!drag.active || !isActive) return
+    if (!drag.active || !isActive || isLocked) return
     setDrag({
       x: e.clientX - startPos.current.x,
       y: e.clientY - startPos.current.y,
       active: true,
     })
-  }, [drag.active, isActive])
+  }, [drag.active, isActive, isLocked])
 
   const handlePointerUp = useCallback(() => {
-    if (!drag.active || !isActive) return
+    if (!drag.active || !isActive || isLocked) return
     setDrag(d => ({ ...d, active: false }))
 
     if (drag.x < -SWIPE_THRESHOLD) {
@@ -96,7 +98,7 @@ export function SwipeCard({
     } else {
       setDrag({ x: 0, y: 0, active: false })
     }
-  }, [drag, isActive, onSwipeLeft, onSwipeRight])
+  }, [drag, isActive, isLocked, onSwipeLeft, onSwipeRight])
 
   // Apakah drag cukup jauh untuk swipe?
   const swipeIndicator =
@@ -113,7 +115,7 @@ export function SwipeCard({
         zIndex,
         opacity,
         touchAction: isActive ? 'none' : 'auto',
-        cursor: isActive ? (drag.active ? 'grabbing' : 'grab') : 'default',
+        cursor: isLocked ? 'default' : (isActive ? (drag.active ? 'grabbing' : 'grab') : 'default'),
         userSelect: 'none',
         willChange: 'transform',
       }}
