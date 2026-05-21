@@ -469,7 +469,7 @@ export default function LearnPage() {
         )}
 
         {/* Bottom action buttons */}
-        <div className="px-6 pb-6 grid grid-cols-2 gap-3">
+        <div className="px-6 pb-6 pt-20 grid grid-cols-2 gap-3">
           <button
             onClick={() => !isLocked && handleSwipe('left')}
             disabled={isLocked || remaining === 0}
