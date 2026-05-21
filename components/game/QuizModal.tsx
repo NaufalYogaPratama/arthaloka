@@ -181,15 +181,15 @@ export default function QuizModal({
                   border: "1px solid rgba(255, 255, 255, 0.12)",
                 }}
               >
-                <p className="text-white font-bold text-sm leading-relaxed">
+                <p className="text-white font-bold text-sm md:text-base leading-relaxed">
                   {question.questionText}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* ── ROW 3: Option Buttons — 2×2 grid ── */}
-          <div className="grid grid-cols-2 gap-2.5">
+          {/* ── ROW 3: Option Buttons — Vertical Stack ── */}
+          <div className="flex flex-col gap-2.5 md:gap-3.5">
             {question.options.map((opt, i) => {
               const isSelected = selectedIndex === i;
               const isCorrect =
@@ -202,7 +202,7 @@ export default function QuizModal({
                   key={i}
                   onClick={() => handleSelect(i)}
                   disabled={selectedIndex !== null}
-                  className="flex items-center gap-2.5 rounded-xl p-3 text-left transition-all duration-150 active:scale-95"
+                  className="flex items-center gap-3 md:gap-4 rounded-xl p-3 md:p-4 text-left transition-all duration-150 active:scale-95"
                   style={{
                     background: isCorrect
                       ? "rgba(34, 197, 94, 0.2)"
@@ -219,12 +219,12 @@ export default function QuizModal({
                 >
                   {/* Label kotak A/B/C/D atau icon hasil */}
                   {isCorrect ? (
-                    <CheckCircle2 className="w-6 h-6 flex-shrink-0 text-green-400" />
+                    <CheckCircle2 className="w-6 h-6 md:w-8 md:h-8 flex-shrink-0 text-green-400" />
                   ) : isWrong ? (
-                    <XCircle className="w-6 h-6 flex-shrink-0 text-red-400" />
+                    <XCircle className="w-6 h-6 md:w-8 md:h-8 flex-shrink-0 text-red-400" />
                   ) : (
                     <div
-                      className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 text-xs font-black"
+                      className="w-6 h-6 md:w-8 md:h-8 rounded-md flex items-center justify-center flex-shrink-0 text-xs md:text-base font-black"
                       style={{ background: color.bg, color: color.text }}
                     >
                       {String.fromCharCode(65 + i)}
@@ -233,7 +233,7 @@ export default function QuizModal({
 
                   {/* Teks opsi */}
                   <span
-                    className="text-xs font-semibold leading-tight flex-1"
+                    className="text-[11px] sm:text-sm md:text-base font-semibold leading-snug flex-1"
                     style={{
                       color: isCorrect
                         ? "#86efac"
@@ -242,7 +242,7 @@ export default function QuizModal({
                           : "#e2e8f0",
                     }}
                   >
-                    {opt}
+                    {opt.replace(/^[A-D]\.\s*/, '')}
                   </span>
                 </button>
               );

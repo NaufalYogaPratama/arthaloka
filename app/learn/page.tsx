@@ -260,7 +260,7 @@ export default function LearnPage() {
                hover:text-gray-600 transition-colors"
               >
                 <FastForward className="w-3 h-3" />
-                Lewati semua
+                {/* Lewati semua */}
               </button>
             </div>
           )}

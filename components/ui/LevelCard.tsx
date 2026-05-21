@@ -28,7 +28,7 @@ const LEVEL_CONFIG: Record<GameLevel, {
     easy: {
         label: 'Easy',
         tagline: 'Mulai perjalanan finansialmu!',
-        topics: ['Budgeting', 'Menabung', 'Needs vs Wants'],
+        topics: ['', '', ''],
         color: '#15803d',
         bgGradient: 'linear-gradient(135deg, #f0fdf4, #dcfce7)',
         borderColor: '#86efac',
@@ -38,7 +38,7 @@ const LEVEL_CONFIG: Record<GameLevel, {
     medium: {
         label: 'Medium',
         tagline: 'Hadapi tantangan keuangan nyata!',
-        topics: ['Impulsive Buying', 'Pay Later', 'Kelola Hutang'],
+        topics: ['', '', ''],
         color: '#1d4ed8',
         bgGradient: 'linear-gradient(135deg, #eff6ff, #dbeafe)',
         borderColor: '#93c5fd',
@@ -48,7 +48,7 @@ const LEVEL_CONFIG: Record<GameLevel, {
     hard: {
         label: 'Hard',
         tagline: 'Kuasai investasi & risiko finansial!',
-        topics: ['Pinjol Ilegal', 'Investasi', 'Bunga Berbunga'],
+        topics: ['', '', ''],
         color: '#991b1b',
         bgGradient: 'linear-gradient(135deg, #fef2f2, #fee2e2)',
         borderColor: '#fca5a5',
